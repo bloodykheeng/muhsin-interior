@@ -4,154 +4,156 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTheme } from "@/providers/ThemeProvider";
 import { FiSun, FiMoon, FiMenu, FiX } from "react-icons/fi";
+import Image from "next/image";
 
 const navLinks = [
     { label: "Home", href: "#home" },
     { label: "About", href: "#about" },
-    { label: "Services", href: "#services" },
-    { label: "Projects", href: "#projects" },
+    { label: "Service", href: "#services" },
+    { label: "Project", href: "#projects" },
     { label: "Contact", href: "#contact" },
 ];
 
 export default function Navbar() {
     const { theme, setTheme } = useTheme();
-    const [scrolled, setScrolled] = useState(false);
     const [menuOpen, setMenuOpen] = useState(false);
 
     useEffect(() => {
-        const handleScroll = () => setScrolled(window.scrollY > 40);
-        window.addEventListener("scroll", handleScroll);
-        return () => window.removeEventListener("scroll", handleScroll);
+        const onResize = () => { if (window.innerWidth >= 768) setMenuOpen(false); };
+        window.addEventListener("resize", onResize);
+        return () => window.removeEventListener("resize", onResize);
     }, []);
-
-    const isDark = theme === "dark";
 
     return (
         <>
-            <motion.nav
-                initial={{ y: -80, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-                className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${scrolled
-                    ? isDark
-                        ? "bg-[#0e0e0e]/95 backdrop-blur-md shadow-2xl border-b border-white/5"
-                        : "bg-white/95 backdrop-blur-md shadow-lg border-b border-stone-200/80"
-                    : "bg-transparent"
-                    }`}
-            >
-                <div className="max-w-7xl mx-auto px-6 lg:px-12 flex items-center justify-between h-18 py-4">
-                    {/* Logo */}
-                    <motion.a
-                        href="#home"
-                        className="flex items-center gap-3 group"
-                        whileHover={{ scale: 1.02 }}
-                    >
-                        <div className={`w-8 h-8 flex items-center justify-center ${isDark ? "bg-[#c8a97e]" : "bg-[#3d6b5e]"}`}>
-                            <span className="text-white font-bold text-sm">M</span>
-                        </div>
-                        <div>
-                            <span className={`font-['Playfair_Display'] font-bold text-lg tracking-wider ${isDark ? "text-white" : "text-[#1a1a1a]"}`}>
-                                MUHSIN
-                            </span>
-                            <span className={`block text-[9px] tracking-[0.3em] uppercase font-light -mt-1 ${isDark ? "text-[#c8a97e]" : "text-[#3d6b5e]"}`}>
-                                Interiors
-                            </span>
-                        </div>
-                    </motion.a>
+            {/* ─── Navbar
+          The nav sits on top of the two-tone hero background.
+          Left half is transparent (shows white hero bg).
+          Right half is transparent (shows grey hero bg strip).
+          So the nav itself is just fully transparent.
+      ─── */}
+            <nav className="fixed top-0 left-0 right-0 z-50 bg-transparent">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 flex items-center justify-between h-[72px]">
 
-                    {/* Desktop links */}
+                    {/* Logo — sits on the white left side */}
+                    <a href="#home" className="flex items-center">
+                        <Image
+                            src="/logos/yuri-logo.jpg"
+                            alt="Yuri Perfections"
+                            width={80}   // you can adjust
+                            height={80}  // make width = height for square
+                            className="h-20 w-20 object-contain" // Tailwind square size
+                            priority
+                        />
+                    </a>
+
+                    {/* Desktop links — sit on the grey right side */}
                     <div className="hidden md:flex items-center gap-8">
-                        {navLinks.map((link, i) => (
-                            <motion.a
+                        {navLinks.map((link) => (
+                            <a
                                 key={link.label}
                                 href={link.href}
-                                initial={{ opacity: 0, y: -10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.1 * i + 0.3 }}
-                                className={`text-xs tracking-[0.2em] uppercase font-medium transition-colors duration-200 relative group ${isDark ? "text-white/70 hover:text-[#c8a97e]" : "text-stone-600 hover:text-[#3d6b5e]"
-                                    }`}
+                                className="text-[11px] font-semibold tracking-[0.18em] uppercase font-['Poppins']
+                                           transition-colors duration-200 relative group
+                                           text-[#181B34]/55 hover:text-[#181B34]
+                                           dark:text-white/55 dark:hover:text-[#F5C518]"
                             >
                                 {link.label}
-                                <span className={`absolute -bottom-1 left-0 w-0 h-px transition-all duration-300 group-hover:w-full ${isDark ? "bg-[#c8a97e]" : "bg-[#3d6b5e]"}`} />
-                            </motion.a>
+                                <span
+                                    className="absolute -bottom-1 left-0 w-0 h-[2px]
+                                               transition-all duration-300 group-hover:w-full
+                                               bg-[#181B34] dark:bg-[#F5C518]"
+                                />
+                            </a>
                         ))}
+
+                        <button
+                            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                            aria-label="Toggle theme"
+                            className="w-9 h-9 rounded-full flex items-center justify-center
+                                       transition-colors border
+                                       border-[#181B34]/20 text-[#181B34] hover:bg-[#181B34]/8
+                                       dark:border-white/15 dark:text-white dark:hover:bg-white/10"
+                        >
+                            {theme === "dark" ? <FiSun size={15} /> : <FiMoon size={15} />}
+                        </button>
                     </div>
 
-                    {/* Right side */}
-                    <div className="flex items-center gap-4">
-                        <motion.button
-                            whileHover={{ scale: 1.1 }}
-                            whileTap={{ scale: 0.95 }}
-                            onClick={() => setTheme(isDark ? "light" : "dark")}
-                            className={`w-9 h-9 rounded-full flex items-center justify-center transition-colors ${isDark ? "bg-white/10 hover:bg-white/20 text-[#c8a97e]" : "bg-stone-100 hover:bg-stone-200 text-[#3d6b5e]"
-                                }`}
-                        >
-                            {isDark ? <FiSun size={16} /> : <FiMoon size={16} />}
-                        </motion.button>
-
-                        <motion.a
-                            href="#contact"
-                            whileHover={{ scale: 1.02 }}
-                            whileTap={{ scale: 0.98 }}
-                            className={`hidden md:block text-xs tracking-[0.15em] uppercase px-5 py-2.5 font-medium transition-all duration-300 ${isDark
-                                ? "bg-[#c8a97e] text-[#0e0e0e] hover:bg-[#d4b88a]"
-                                : "bg-[#3d6b5e] text-white hover:bg-[#2d5248]"
-                                }`}
-                        >
-                            Get Quote
-                        </motion.a>
-
-                        {/* Mobile menu button */}
+                    {/* Mobile controls */}
+                    <div className="flex md:hidden items-center gap-3">
                         <button
-                            className={`md:hidden w-9 h-9 flex items-center justify-center ${isDark ? "text-white" : "text-stone-800"}`}
-                            onClick={() => setMenuOpen(!menuOpen)}
+                            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                            aria-label="Toggle theme"
+                            className="w-9 h-9 rounded-full flex items-center justify-center border
+                                       border-[#181B34]/20 text-[#181B34]
+                                       dark:border-white/15 dark:text-white"
                         >
-                            {menuOpen ? <FiX size={20} /> : <FiMenu size={20} />}
+                            {theme === "dark" ? <FiSun size={15} /> : <FiMoon size={15} />}
+                        </button>
+
+                        <button
+                            onClick={() => setMenuOpen(!menuOpen)}
+                            className="text-[#181B34] dark:text-white"
+                        >
+                            {menuOpen ? <FiX size={24} /> : <FiMenu size={24} />}
                         </button>
                     </div>
                 </div>
-            </motion.nav>
+            </nav>
 
-            {/* Mobile Menu */}
+            {/* ─── Mobile full-screen menu ─── */}
             <AnimatePresence>
                 {menuOpen && (
                     <motion.div
-                        initial={{ opacity: 0, x: "100%" }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: "100%" }}
-                        transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-                        className={`fixed inset-0 z-40 flex flex-col pt-24 px-8 pb-12 ${isDark ? "bg-[#0e0e0e]" : "bg-white"
-                            }`}
+                        initial={{ opacity: 0, y: -16 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -16 }}
+                        transition={{ duration: 0.28 }}
+                        className="fixed inset-0 z-40 pt-[72px] bg-white dark:bg-[#181B34]"
                     >
-                        {navLinks.map((link, i) => (
+                        {/* Logo */}
+                        <div className="absolute top-4 left-4 sm:left-6">
+                            <Image
+                                src="/logos/yuri-logo.jpg"
+                                alt="Yuri Perfections"
+                                width={100}
+                                height={44}
+                                className="h-9 w-auto object-contain"
+                            />
+                        </div>
+
+                        <div className="flex flex-col px-6 pt-6">
+                            {navLinks.map((link, i) => (
+                                <motion.a
+                                    key={link.label}
+                                    href={link.href}
+                                    initial={{ opacity: 0, x: 18 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    transition={{ delay: i * 0.055 }}
+                                    onClick={() => setMenuOpen(false)}
+                                    className="text-2xl font-bold font-['Poppins'] py-4 border-b
+                                               transition-colors
+                                               text-[#181B34] border-[#181B34]/10 hover:text-[#181B34]/50
+                                               dark:text-white dark:border-white/10 dark:hover:text-[#F5C518]"
+                                >
+                                    {link.label}
+                                </motion.a>
+                            ))}
+
                             <motion.a
-                                key={link.label}
-                                href={link.href}
-                                initial={{ opacity: 0, x: 30 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                transition={{ delay: i * 0.07 }}
+                                href="#contact"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                transition={{ delay: 0.32 }}
                                 onClick={() => setMenuOpen(false)}
-                                className={`font-['Playfair_Display'] text-3xl font-bold py-4 border-b transition-colors ${isDark
-                                    ? "text-white border-white/10 hover:text-[#c8a97e]"
-                                    : "text-stone-800 border-stone-100 hover:text-[#3d6b5e]"
-                                    }`}
+                                className="flex items-center justify-center w-full py-4 mt-6
+                                           bg-[#F5C518] text-[#181B34]
+                                           font-bold font-['Poppins'] text-sm
+                                           tracking-[0.15em] uppercase"
                             >
-                                {link.label}
+                                Get a Free Quote
                             </motion.a>
-                        ))}
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            transition={{ delay: 0.4 }}
-                            className="mt-auto"
-                        >
-                            <p className={`text-xs tracking-[0.2em] uppercase mb-2 ${isDark ? "text-white/40" : "text-stone-400"}`}>
-                                Based in Kampala, Uganda
-                            </p>
-                            <p className={`text-sm ${isDark ? "text-white/60" : "text-stone-500"}`}>
-                                +256 700 000 000
-                            </p>
-                        </motion.div>
+                        </div>
                     </motion.div>
                 )}
             </AnimatePresence>

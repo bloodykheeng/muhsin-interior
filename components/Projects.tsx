@@ -5,16 +5,16 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useTheme } from "@/providers/ThemeProvider";
 import { FiArrowRight, FiMaximize2 } from "react-icons/fi";
 
-const categories = ["All", "Residential", "Commercial", "Minimalist", "Renovation"];
+const categories = ["All", "Residential", "Commercial", "Ceiling", "Renovation"];
 
 const projects = [
     {
         id: 1,
         title: "The Nakasero Residence",
         style: "Minimalist Style",
-        category: "Minimalist",
-        location: "Nakasero, Kampala",
-        desc: "A serene residence with a minimalist and modern interior design — grey tones giving an impression of calm sophistication.",
+        category: "Residential",
+        location: "Nakasero",
+        desc: "A serene residence featuring precision ceiling installations, custom cabinetry, and a full interior renovation with cool grey tones delivering calm sophistication.",
         imgs: [
             "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=600&q=80",
             "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=600&q=80",
@@ -27,8 +27,8 @@ const projects = [
         title: "Kololo Executive Villa",
         style: "Contemporary Luxury",
         category: "Residential",
-        location: "Kololo, Kampala",
-        desc: "A bold executive residence with warm wood tones, dramatic lighting, and bespoke furniture.",
+        location: "Kololo",
+        desc: "A bold executive residence featuring decorative suspended ceiling systems, warm wood custom cabinetry, bespoke wall partitioning, and premium exterior painting.",
         imgs: [
             "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=600&q=80",
             "https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?w=600&q=80",
@@ -39,8 +39,8 @@ const projects = [
         title: "Bugolobi Office Hub",
         style: "Modern Commercial",
         category: "Commercial",
-        location: "Bugolobi, Kampala",
-        desc: "A productive, light-filled workspace designed to inspire creativity and collaboration.",
+        location: "Bugolobi",
+        desc: "A productive, light-filled workspace with suspended ceiling systems, aluminum entrance framing, glass partitioning, and professional interior painting.",
         imgs: [
             "https://images.unsplash.com/photo-1497366216548-37526070297c?w=600&q=80",
             "https://images.unsplash.com/photo-1524758631624-e2822e304c36?w=600&q=80",
@@ -49,10 +49,10 @@ const projects = [
     {
         id: 4,
         title: "Muyenga Townhouse",
-        style: "Warm Eclectic",
+        style: "Full Renovation",
         category: "Renovation",
-        location: "Muyenga, Kampala",
-        desc: "A full renovation blending traditional Ugandan textures with modern finishes.",
+        location: "Muyenga",
+        desc: "Comprehensive renovation — new ceiling installations, custom millwork, smart wall partitioning, terrace perimeter systems, and full interior/exterior painting.",
         imgs: [
             "https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=600&q=80",
             "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=600&q=80",
@@ -66,12 +66,15 @@ export default function Projects() {
     const [activeCategory, setActiveCategory] = useState("All");
     const [selected, setSelected] = useState(projects[0]);
 
-    const filtered = activeCategory === "All" ? projects : projects.filter(p => p.category === activeCategory);
+    const filtered =
+        activeCategory === "All"
+            ? projects
+            : projects.filter((p) => p.category === activeCategory);
 
     return (
         <section
             id="projects"
-            className={`py-24 lg:py-36 ${isDark ? "bg-[#0e0e0e]" : "bg-white"}`}
+            className={`py-24 lg:py-36 ${isDark ? "bg-[#181B34]" : "bg-white"}`}
         >
             <div className="max-w-7xl mx-auto px-6 lg:px-12">
                 {/* Header */}
@@ -82,29 +85,27 @@ export default function Projects() {
                         viewport={{ once: true }}
                     >
                         <div className="flex items-center gap-3 mb-4">
-                            <div className={`h-px w-10 ${isDark ? "bg-[#c8a97e]" : "bg-[#3d6b5e]"}`} />
-                            <span className={`text-xs tracking-[0.3em] uppercase font-medium ${isDark ? "text-[#c8a97e]" : "text-[#3d6b5e]"}`}>
+                            <div className="h-px w-10 bg-[#F5C518]" />
+                            <span className={`text-xs tracking-[0.3em] uppercase font-semibold font-['Poppins'] ${isDark ? "text-[#F5C518]" : "text-[#181B34]/60"}`}>
                                 Portfolio
                             </span>
                         </div>
-                        <h2 className={`font-['Playfair_Display'] font-bold text-4xl lg:text-5xl ${isDark ? "text-white" : "text-stone-900"}`}>
+                        <h2 className={`font-['Poppins'] font-bold text-4xl lg:text-5xl ${isDark ? "text-white" : "text-[#181B34]"}`}>
                             Our Last Projects
                         </h2>
                     </motion.div>
 
-                    {/* Category filter */}
+                    {/* Category filters */}
                     <div className="flex flex-wrap gap-2">
                         {categories.map((cat) => (
                             <button
                                 key={cat}
                                 onClick={() => setActiveCategory(cat)}
-                                className={`px-4 py-2 text-xs tracking-[0.15em] uppercase font-medium transition-all duration-200 ${activeCategory === cat
-                                    ? isDark
-                                        ? "bg-[#c8a97e] text-[#0e0e0e]"
-                                        : "bg-[#3d6b5e] text-white"
+                                className={`px-4 py-2 text-xs tracking-[0.15em] uppercase font-semibold font-['Poppins'] transition-all duration-200 ${activeCategory === cat
+                                    ? "bg-[#F5C518] text-[#181B34]"
                                     : isDark
-                                        ? "border border-white/20 text-white/50 hover:border-white/40 hover:text-white"
-                                        : "border border-stone-200 text-stone-400 hover:border-stone-400 hover:text-stone-700"
+                                        ? "border border-white/20 text-white/50 hover:border-[#F5C518]/50 hover:text-[#F5C518]"
+                                        : "border border-slate-200 text-slate-400 hover:border-[#181B34]/40 hover:text-[#181B34]"
                                     }`}
                             >
                                 {cat}
@@ -122,36 +123,33 @@ export default function Projects() {
                         exit={{ opacity: 0 }}
                         className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-16"
                     >
-                        {/* Description */}
-                        <div className={`flex flex-col justify-center p-8 lg:p-12 ${isDark ? "bg-[#141414]" : "bg-[#f5f2ee]"}`}>
-                            <span className={`text-xs tracking-[0.25em] uppercase font-medium mb-3 ${isDark ? "text-[#c8a97e]" : "text-[#3d6b5e]"}`}>
+                        {/* Info panel */}
+                        <div className={`flex flex-col justify-center p-8 lg:p-12 ${isDark ? "bg-[#0f1124]" : "bg-[#F0F3FF]"}`}>
+                            <span className={`text-xs tracking-[0.25em] uppercase font-semibold font-['Poppins'] mb-3 ${isDark ? "text-[#F5C518]" : "text-[#181B34]/60"}`}>
                                 {selected.style}
-                                <span className={`inline-block w-8 h-px ml-3 align-middle ${isDark ? "bg-[#c8a97e]" : "bg-[#3d6b5e]"}`} />
+                                <span className={`inline-block w-8 h-px ml-3 align-middle bg-[#F5C518]`} />
                             </span>
-                            <h3 className={`font-['Playfair_Display'] font-bold text-3xl mb-2 ${isDark ? "text-white" : "text-stone-900"}`}>
+                            <h3 className={`font-['Poppins'] font-bold text-3xl mb-2 ${isDark ? "text-white" : "text-[#181B34]"}`}>
                                 {selected.title}
                             </h3>
-                            <p className={`text-xs tracking-widest uppercase mb-6 ${isDark ? "text-white/30" : "text-stone-400"}`}>
+                            <p className={`text-xs tracking-widest uppercase mb-6 font-['Poppins'] ${isDark ? "text-white/30" : "text-slate-400"}`}>
                                 {selected.location}
                             </p>
-                            <p className={`text-sm leading-relaxed font-light mb-8 ${isDark ? "text-white/60" : "text-stone-500"}`}>
+                            <p className={`text-sm leading-relaxed font-light mb-8 font-['Poppins'] ${isDark ? "text-white/60" : "text-slate-500"}`}>
                                 {selected.desc}
                             </p>
                             <motion.a
                                 href="#contact"
-                                whileHover={{ scale: 1.03 }}
+                                whileHover={{ scale: 1.03, backgroundColor: "#e6b800" }}
                                 whileTap={{ scale: 0.97 }}
-                                className={`inline-flex items-center gap-3 self-start px-6 py-3 text-xs tracking-[0.15em] uppercase font-semibold ${isDark
-                                    ? "bg-[#c8a97e] text-[#0e0e0e] hover:bg-[#d4b88a]"
-                                    : "bg-[#3d6b5e] text-white hover:bg-[#2d5248]"
-                                    }`}
+                                className="inline-flex items-center gap-3 self-start px-6 py-3 text-xs tracking-[0.15em] uppercase font-bold font-['Poppins'] bg-[#F5C518] text-[#181B34] transition-colors"
                             >
                                 Read More
                                 <FiArrowRight size={14} />
                             </motion.a>
                         </div>
 
-                        {/* Images grid */}
+                        {/* Image grid */}
                         <div className="grid grid-cols-2 gap-3">
                             {selected.imgs.slice(0, 4).map((img, i) => (
                                 <motion.div
@@ -161,7 +159,11 @@ export default function Projects() {
                                     transition={{ delay: i * 0.08 }}
                                     className="relative group overflow-hidden aspect-square"
                                 >
-                                    <img src={img} alt="" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                                    <img
+                                        src={img}
+                                        alt=""
+                                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                                    />
                                     <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors duration-300 flex items-center justify-center">
                                         <FiMaximize2 className="text-white opacity-0 group-hover:opacity-100 transition-opacity" size={20} />
                                     </div>
@@ -171,7 +173,7 @@ export default function Projects() {
                     </motion.div>
                 </AnimatePresence>
 
-                {/* Project cards */}
+                {/* Project thumbnails */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                     {filtered.map((p, i) => (
                         <motion.div
@@ -181,7 +183,8 @@ export default function Projects() {
                             viewport={{ once: true }}
                             transition={{ delay: i * 0.1 }}
                             onClick={() => setSelected(p)}
-                            className={`group cursor-pointer relative overflow-hidden ${selected.id === p.id ? "ring-2 " + (isDark ? "ring-[#c8a97e]" : "ring-[#3d6b5e]") : ""}`}
+                            className={`group cursor-pointer relative overflow-hidden transition-all duration-200 ${selected.id === p.id ? "ring-[3px] ring-[#F5C518]" : ""
+                                }`}
                         >
                             <img
                                 src={p.imgs[0]}
@@ -190,8 +193,12 @@ export default function Projects() {
                             />
                             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
                             <div className="absolute bottom-0 left-0 right-0 p-4">
-                                <p className="text-[#c8a97e] text-[9px] tracking-widest uppercase mb-1">{p.style}</p>
-                                <p className="text-white text-sm font-['Playfair_Display'] font-semibold">{p.title}</p>
+                                <p className="text-[#F5C518] text-[9px] tracking-widest uppercase mb-1 font-['Poppins'] font-semibold">
+                                    {p.style}
+                                </p>
+                                <p className="text-white text-sm font-['Poppins'] font-semibold">
+                                    {p.title}
+                                </p>
                             </div>
                         </motion.div>
                     ))}

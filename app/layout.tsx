@@ -1,24 +1,20 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Poppins } from "next/font/google";
 import "./globals.css";
 
 import { ThemeProvider } from "@/providers/ThemeProvider";
 import { cookies } from "next/headers";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const poppins = Poppins({
+  variable: "--font-poppins",
   subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700", "800"],
 });
 
 export const metadata: Metadata = {
-  title: "Muhsin Interiors | Premium Interior Design — Kampala, Uganda",
+  title: "Yuri Perfections | Precision Craftsmanship. Exceptional Finishes.",
   description:
-    "Muhsin Interiors is a premium interior design and renovation agency based in Kampala, Uganda. We craft breathtaking residential and commercial spaces.",
+    "Yuri Perfections delivers professional interior and exterior renovation — ceiling installation, wall remodeling, painting, custom cabinetry, aluminum framing, and terrace perimeter systems.",
 };
 
 export default function RootLayout({
@@ -36,9 +32,7 @@ export default function RootLayout({
 
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body className={`${poppins.variable} antialiased`}>
         <ThemeProvider defaultTheme={defaultTheme}>
           {children}
         </ThemeProvider>

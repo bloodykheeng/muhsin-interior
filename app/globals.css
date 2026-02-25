@@ -1,39 +1,39 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:is(.dark *));
+
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #181b34;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-poppins);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #181b34;
+    --foreground: #f0f3ff;
   }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: "Poppins", system-ui, sans-serif;
+  transition:
+    background-color 0.5s ease,
+    color 0.5s ease;
 }
 
-/* //========================== my styles ============================ */
-/* ── Theme tokens ── */
+/* ── Brand tokens ── */
 :root {
-  --color-brand-green: #3d6b5e;
-  --color-brand-gold: #c8a97e;
-  --color-brand-dark: #0e0e0e;
-  --color-brand-light: #f5f2ee;
-  --font-display: "Playfair Display", Georgia, serif;
-  --font-body: "DM Sans", system-ui, sans-serif;
+  --color-brand-navy: #181b34; /* primary / dark */
+  --color-brand-gold: #f5c518; /* accent — from logo */
+  --color-brand-light: #f0f3ff; /* background tint */
 }
 
 /* ── Smooth scroll ── */
@@ -43,30 +43,30 @@ html {
 
 /* ── Dark mode base ── */
 html.dark body {
-  background-color: #0e0e0e;
-  color: #f5f2ee;
+  background-color: #181b34;
+  color: #f0f3ff;
 }
 
 html.light body {
   background-color: #ffffff;
-  color: #1a1a1a;
+  color: #181b34;
 }
 
 /* ── Selection highlight ── */
 ::selection {
-  background-color: #c8a97e;
-  color: #0e0e0e;
+  background-color: #f5c518;
+  color: #181b34;
 }
 
 /* ── Custom scrollbar ── */
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 5px;
 }
 ::-webkit-scrollbar-track {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #c8a97e;
+  background: #f5c518;
   border-radius: 3px;
 }
 
