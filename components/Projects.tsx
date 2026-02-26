@@ -82,7 +82,7 @@ export default function Projects() {
                     <motion.div
                         initial={{ opacity: 0, y: 30 }}
                         whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
+                        viewport={{ once: false, amount: 0.3 }}
                     >
                         <div className="flex items-center gap-3 mb-4">
                             <div className="h-px w-10 bg-[#F5C518]" />
@@ -180,7 +180,7 @@ export default function Projects() {
                             key={p.id}
                             initial={{ opacity: 0, y: 20 }}
                             whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
+                            viewport={{ once: false, amount: 0.3 }}
                             transition={{ delay: i * 0.1 }}
                             onClick={() => setSelected(p)}
                             className={`group cursor-pointer relative overflow-hidden transition-all duration-200 ${selected.id === p.id ? "ring-[3px] ring-[#F5C518]" : ""

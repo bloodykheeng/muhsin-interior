@@ -71,7 +71,7 @@ export default function Services() {
                 <motion.div
                     initial={{ opacity: 0, y: 30 }}
                     whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
+                    viewport={{ once: false, amount: 0.3 }}
                     transition={{ duration: 0.7 }}
                     className="max-w-2xl mb-16"
                 >
@@ -97,7 +97,7 @@ export default function Services() {
                             key={s.title}
                             initial={{ opacity: 0, y: 40 }}
                             whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
+                            viewport={{ once: false, amount: 0.3 }}
                             transition={{ delay: i * 0.09, duration: 0.6 }}
                             whileHover={{ y: -6 }}
                             className={`group relative overflow-hidden cursor-pointer shadow-sm hover:shadow-xl transition-all duration-500 ${isDark ? "bg-[#181B34]" : "bg-white"

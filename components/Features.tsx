@@ -36,7 +36,7 @@ export default function Features() {
                             key={f.title}
                             initial={{ opacity: 0, y: 30 }}
                             whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
+                            viewport={{ once: false, amount: 0.3 }}
                             transition={{ delay: i * 0.12, duration: 0.6 }}
                             className="group px-8 py-10 hover:bg-[#F5C518]/5 transition-colors duration-300 text-center"
                         >

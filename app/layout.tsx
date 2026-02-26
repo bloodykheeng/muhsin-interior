@@ -17,7 +17,7 @@ export const metadata: Metadata = {
     "Yuri Perfections delivers professional interior and exterior renovation — ceiling installation, wall remodeling, painting, custom cabinetry, aluminum framing, and terrace perimeter systems.",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
@@ -28,12 +28,12 @@ export default function RootLayout({
     return cookieStore.get("theme");
   };
 
-  const defaultTheme = getCookie();
+  const defaultTheme = await getCookie();
 
   return (
     <html lang="en">
       <body className={`${poppins.variable} antialiased`}>
-        <ThemeProvider defaultTheme={defaultTheme}>
+        <ThemeProvider defaultTheme={defaultTheme?.value}>
           {children}
         </ThemeProvider>
       </body>

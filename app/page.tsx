@@ -8,13 +8,14 @@ import Testimonials from "@/components/Testimonials";
 import DiscountBanner from "@/components/DiscountBanner";
 import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
+import ScrollToTop from "@/components/ScrollToTop";
 
 export default function Home() {
   return (
-    <main>
+    <main className="relative min-h-dvh">
       <Navbar />
       <Hero />
-      <Features />
+      {/* <Features /> */}
       <About />
       <Services />
       <Projects />
@@ -22,6 +23,7 @@ export default function Home() {
       <DiscountBanner />
       <Contact />
       <Footer />
+      <ScrollToTop />
     </main>
   );
 }

@@ -36,7 +36,7 @@ export default function Contact() {
                 <motion.div
                     initial={{ opacity: 0, y: 30 }}
                     whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
+                    viewport={{ once: false, amount: 0.3 }}
                     className="text-center mb-16"
                 >
                     <div className="flex items-center justify-center gap-3 mb-4">
@@ -59,7 +59,7 @@ export default function Contact() {
                     <motion.div
                         initial={{ opacity: 0, x: -30 }}
                         whileInView={{ opacity: 1, x: 0 }}
-                        viewport={{ once: true }}
+                        viewport={{ once: false, amount: 0.3 }}
                         className="lg:col-span-2 space-y-8"
                     >
                         {/* Map placeholder */}
@@ -101,7 +101,7 @@ export default function Contact() {
                     <motion.div
                         initial={{ opacity: 0, x: 30 }}
                         whileInView={{ opacity: 1, x: 0 }}
-                        viewport={{ once: true }}
+                        viewport={{ once: false, amount: 0.3 }}
                         className="lg:col-span-3"
                     >
                         {sent ? (

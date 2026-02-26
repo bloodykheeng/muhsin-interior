@@ -27,7 +27,7 @@ export default function DiscountBanner() {
                     <motion.div
                         initial={{ opacity: 0, x: -30 }}
                         whileInView={{ opacity: 1, x: 0 }}
-                        viewport={{ once: true }}
+                        viewport={{ once: false, amount: 0.3 }}
                     >
                         <p className="text-[#0e0e0e]/60 text-xs tracking-[0.3em] uppercase font-medium mb-2">
                             Limited Offer
@@ -46,7 +46,7 @@ export default function DiscountBanner() {
                     <motion.div
                         initial={{ opacity: 0, x: 30 }}
                         whileInView={{ opacity: 1, x: 0 }}
-                        viewport={{ once: true }}
+                        viewport={{ once: false, amount: 0.3 }}
                     >
                         {sent ? (
                             <div className="text-center py-4">
