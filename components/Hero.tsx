@@ -155,7 +155,7 @@ export default function Hero() {
 
                             <div className="mt-7 flex flex-wrap justify-center lg:justify-start gap-3">
                                 <a href="#contact" className="inline-flex items-center bg-[#F5C518] text-[#181B34] px-6 py-3 text-[11px] tracking-[0.18em] uppercase font-bold font-['Poppins'] hover:bg-[#e6b800] transition-colors whitespace-nowrap">
-                                    Schedule Consultation
+                                    Schedule A Consultation
                                 </a>
                                 <a href="#projects" className="inline-flex items-center border-2 border-[#181B34] dark:border-white text-[#181B34] dark:text-white px-6 py-3 text-[11px] tracking-[0.18em] uppercase font-bold font-['Poppins'] hover:bg-[#181B34] hover:text-white dark:hover:bg-white dark:hover:text-[#181B34] transition-colors whitespace-nowrap">
                                     View Portfolio
