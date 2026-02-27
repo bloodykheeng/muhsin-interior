@@ -14,7 +14,7 @@ const poppins = Poppins({
 export const metadata: Metadata = {
   title: "Yuri Perfections | Precision Craftsmanship. Exceptional Finishes.",
   description:
-    "Yuri Perfections delivers professional interior and exterior renovation — ceiling installation, wall remodeling, painting, custom cabinetry, aluminum framing, and terrace perimeter systems.",
+    "At Yuri Perfections, we deliver high-quality interior and exterior finishing solutions for both residential and commercial spaces. With a strong focus on precision, craftsmanship, and detail, we transform environments into refined, functional spaces built to last.",
 };
 
 export default async function RootLayout({

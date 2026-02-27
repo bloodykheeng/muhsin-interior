@@ -36,19 +36,21 @@ export default function Footer() {
                             <Image
                                 src="/logos/yuri-white-bg-removebg.png"
                                 alt="Yuri Perfections"
-                                width={120}
-                                height={120}
+                                width={224}
+                                height={224}
                                 className="h-28 w-28 object-contain dark:hidden"
                                 priority
+                                quality={100}
                             />
                             {/* Dark mode logo */}
                             <Image
                                 src="/logos/yuri-dark-logo-removebg.png"
                                 alt="Yuri Perfections"
-                                width={120}
-                                height={120}
+                                width={224}
+                                height={224}
                                 className="h-28 w-28 object-contain hidden dark:block"
                                 priority
+                                quality={100}
                             />
                         </a>
 

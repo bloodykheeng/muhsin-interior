@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
+import Typewriter from "typewriter-effect";
 
 const slides = [
     "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=1600&q=90",
@@ -11,7 +12,12 @@ const slides = [
 
 export default function Hero() {
     const [current, setCurrent] = useState(0);
+    const [typedTitle, setTypedTitle] = useState("");
+    const [headlineDone, setHeadlineDone] = useState(false); // ✅ controls paragraph start
     const nextIndex = (current + 1) % slides.length;
+
+    const fullTitle =
+        "Precision Craftsmanship.\nExceptional Finishes.";
 
     const nextSlide = useCallback(() => {
         setCurrent((prev) => (prev + 1) % slides.length);
@@ -21,6 +27,35 @@ export default function Hero() {
         const timer = setInterval(nextSlide, 5000);
         return () => clearInterval(timer);
     }, [nextSlide]);
+
+    // 🔥 Headline Typewriter Effect
+    useEffect(() => {
+        let i = 0;
+        const speed = 110; // slower & smoother
+
+        const type = () => {
+            if (i < fullTitle.length) {
+                setTypedTitle(fullTitle.slice(0, i + 1));
+                i++;
+                setTimeout(type, speed);
+            } else {
+                // ✅ when headline finishes typing
+                setTimeout(() => {
+                    setHeadlineDone(true);
+                }, 300); // small premium delay before paragraph starts
+            }
+        };
+
+        const startDelay = setTimeout(type, 400); // slight delay before typing starts
+
+        return () => clearTimeout(startDelay);
+    }, []);
+
+    const [line1 = "", line2 = ""] = typedTitle.split("\n");
+
+    // ✅ FIX: Prevent flicker by slicing instead of using includes/replace
+    const precisionLength = "Precision ".length;
+    const exceptionalLength = "Exceptional ".length;
 
     return (
         <section id="home" className="relative w-full overflow-hidden">
@@ -38,8 +73,7 @@ export default function Hero() {
                     <div className="relative w-full lg:w-1/2 h-[250px] md:h-[420px] lg:h-[650px] flex items-center justify-center order-1 lg:order-2 lg:mt-15">
                         <div className="relative w-full h-full lg:ml-auto lg:w-[70%] lg:h-[55%] flex justify-center items-center">
 
-                            {/* <div className="relative w-[85%] h-[80%] z-20 shadow-2xl lg:absolute lg:w-[170%] lg:h-[130%] lg:bottom-[20%] lg:right-[40%]"> */}
-                            <div className="relative w-[85%] h-[80%] z-20 shadow-2xl lg:absolute lg:w-[165%] lg:h-[130%] lg:bottom-[20%] lg:right-[40%]">
+                            <div className="relative w-[85%] h-[80%] z-20 shadow-2xl lg:absolute lg:w-[170%] lg:h-[130%] lg:bottom-[20%] lg:right-[40%]">
                                 {slides.map((src, index) => (
                                     <Image
                                         key={index}
@@ -83,34 +117,40 @@ export default function Hero() {
                             */}
                             <h1 className="font-['Poppins'] font-bold uppercase leading-[1.6] tracking-[0.04em] text-[28px] sm:text-[34px] lg:text-[38px] xl:text-[44px]">
 
-                                {/* Row 1: Precision */}
+                                {/* Row 1: Precision Craftsmanship. */}
                                 <span className="block">
                                     <span className="inline bg-white dark:bg-neutral-950 text-[#181B34] dark:text-white px-2 py-0.5 box-decoration-clone">
-                                        Precision
+                                        {line1.slice(0, precisionLength)}
+                                    </span>
+                                    <span className="inline bg-[#181B34] dark:bg-[#181B34] text-[#F5C518] px-2 py-0.5 box-decoration-clone">
+                                        {line1.slice(precisionLength)}
                                     </span>
                                 </span>
 
-                                {/* Row 2: Craftsmanship. */}
-                                <span className="block">
-                                    <span className="inline bg-[#181B34] text-[#F5C518] px-2 py-0.5 box-decoration-clone">
-                                        Craftsmanship.
+                                {/* Row 2: Exceptional Finishes. */}
+                                <span className="block mt-1">
+                                    <span className="inline bg-white dark:bg-neutral-950 text-[#181B34] dark:text-white px-2 py-0.5 box-decoration-clone">
+                                        {line2.slice(0, exceptionalLength)}
+                                    </span>
+                                    <span className="inline bg-white dark:bg-neutral-950 text-[#181B34] dark:text-white px-2 py-0.5 box-decoration-clone">
+                                        {line2.slice(exceptionalLength)}
                                     </span>
                                 </span>
-
-                                {/* Row 3: Exceptional Finishes. */}
-                                <div className="mt-1 flex flex-wrap justify-center lg:justify-start">
-                                    <span className="bg-white dark:bg-neutral-950 text-[#181B34] dark:text-white px-2 py-0.5 box-decoration-clone">
-                                        Exceptional
-                                    </span>
-                                    <span className="bg-white dark:bg-neutral-950 text-[#181B34] dark:text-white px-2 py-0.5 box-decoration-clone">
-                                        Finishes.
-                                    </span>
-                                </div>
 
                             </h1>
 
-                            <div className="mt-6 text-[14px] lg:text-[15px] text-gray-600 dark:text-gray-400 max-w-full [@media(min-width:700px)]:max-w-[22rem] lg:max-w-md  mx-auto lg:mx-0 leading-7 font-['Poppins'] font-light min-h-[10px]">
-                                At Yuri Perfections, we deliver high-quality interior and exterior finishing solutions for both residential and commercial spaces. With a strong focus on precision, craftsmanship, and detail, we transform environments into refined, functional spaces built to last.
+                            <div className="mt-6 text-[14px] lg:text-[15px] text-gray-600 dark:text-gray-400 max-w-md mx-auto lg:mx-0 leading-7 font-['Poppins'] font-light min-h-[10px]">
+                                {headlineDone && (
+                                    <Typewriter
+                                        options={{
+                                            strings: "At Yuri Perfections, we deliver high-quality interior and exterior finishing solutions for both residential and commercial spaces. With a strong focus on precision, craftsmanship, and detail, we transform environments into refined, functional spaces built to last.",
+                                            autoStart: true,
+                                            loop: false,
+                                            cursor: "",
+                                            delay: 30,
+                                        }}
+                                    />
+                                )}
                             </div>
 
                             <div className="mt-7 flex flex-wrap justify-center lg:justify-start gap-3">
