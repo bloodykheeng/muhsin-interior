@@ -62,15 +62,15 @@ export default function Navbar() {
     return (
         <>
             {/* ─── Navbar
-          The nav sits on top of the two-tone hero background.
-          Left half is transparent (shows white hero bg).
-          Right half is transparent (shows grey hero bg strip).
-          So the nav itself is just fully transparent.
-          On desktop scroll: glassmorphism kicks in so text stays readable.
-      ─── */}
+              The nav sits on top of the two-tone hero background.
+              Left half is transparent (shows white hero bg).
+              Right half is transparent (shows grey hero bg strip).
+              So the nav itself is just fully transparent.
+              On desktop scroll: glassmorphism kicks in so text stays readable.
+          ─── */}
             <nav
                 className={`fixed overflow-hidden top-0 left-0 right-0 z-50 transition-all duration-300
-                    ${scrolled
+                    ${scrolled || menuOpen
                         ? "backdrop-blur-md bg-white/70 dark:bg-[#181B34]/70 shadow-sm pt-3 md:pt-0"
                         : "bg-transparent"
                     }`}
@@ -165,24 +165,7 @@ export default function Navbar() {
                         className="fixed inset-0 z-40 pt-[72px] bg-white dark:bg-[#181B34]"
                     >
                         {/* Logo */}
-                        <div className="absolute top-4 left-4 sm:left-6">
-                            {/* Light mode logo */}
-                            <Image
-                                src="/logos/yuri-white-bg-removebg.png"
-                                alt="Yuri Perfections"
-                                width={80}
-                                height={80}
-                                className="h-9 w-auto object-contain dark:hidden"
-                            />
-                            {/* Dark mode logo */}
-                            <Image
-                                src="/logos/yuri-dark-logo-removebg.png"
-                                alt="Yuri Perfections"
-                                width={80}
-                                height={80}
-                                className="h-9 w-auto object-contain hidden dark:block"
-                            />
-                        </div>
+                        {/* Intentionally removed to prevent flicker & layout jump */}
 
                         <div className="flex flex-col items-center px-6 pt-6">
                             {navLinks.map((link, i) => {
