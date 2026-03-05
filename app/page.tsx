@@ -20,7 +20,7 @@ export default function Home() {
       <Services />
       <Projects />
       <Testimonials />
-      <DiscountBanner />
+      {/* <DiscountBanner /> */}
       <Contact />
       <Footer />
       <ScrollToTop />

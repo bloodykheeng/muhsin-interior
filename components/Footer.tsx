@@ -66,7 +66,7 @@ export default function Footer() {
                                     href={s.href}
                                     whileHover={{ scale: 1.1, y: -2 }}
                                     aria-label={s.label}
-                                    className="w-9 h-9 border border-neutral-300 dark:border-white/10 hover:border-[#F5C518] hover:text-[#F5C518] flex items-center justify-center text-neutral-500 dark:text-white/40 transition-colors"
+                                    className="w-9 h-9 flex items-center justify-center border border-neutral-300 dark:border-white/10 text-neutral-500 dark:text-white/40 transition-colors hover:border-[#F5C518] hover:text-[#F5C518] dark:hover:border-[#F5C518] dark:hover:text-[#F5C518]"
                                 >
                                     <s.icon size={14} />
                                 </motion.a>
@@ -86,7 +86,7 @@ export default function Footer() {
                                         <li key={link}>
                                             <a
                                                 href="#"
-                                                className="text-sm font-light text-neutral-500 dark:text-white/40 hover:text-[#F5C518] transition-colors"
+                                                className="text-sm font-light text-neutral-500 dark:text-white/40 hover:text-[#F5C518] dark:hover:text-[#F5C518] transition-colors"
                                             >
                                                 {link}
                                             </a>
