@@ -14,7 +14,7 @@ const EMAIL_PREFILL_BODY = encodeURIComponent(
     "Hello Yuri Perfections,\n\nI would like to discuss a project with you.\n\nPlease let me know your availability.\n\nBest regards,"
 );
 const PHONE_NUMBER = "+256700000000"; // ← update this
-const MAPS_ADDRESS = encodeURIComponent("Kampala, Uganda");
+const MAPS_ADDRESS = encodeURIComponent("Bukenya Mall, Ntinda, Plot 2 Kimera Road, Kampala, Uganda");
 
 export default function Contact() {
     const { theme } = useTheme();
@@ -41,7 +41,7 @@ export default function Contact() {
         {
             icon: FiMapPin,
             label: "Address",
-            val: "1017 Washington Ave, Kampala, Uganda",
+            val: "Bukenya Mall RM16, Ntinda — Plot 2 Kimera Road",
             href: `https://www.google.com/maps/search/?api=1&query=${MAPS_ADDRESS}`,
             external: true,
         },
@@ -107,15 +107,15 @@ export default function Contact() {
                         {/* Map image */}
                         <div className="relative h-52 overflow-hidden">
                             <img
-                                src="https://images.unsplash.com/photo-1578922746465-3a80a228f223?w=600&q=80"
+                                src="https://images.unsplash.com/photo-1653972233229-1b8c042d6d8e?q=80&w=1332&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D?w=600&q=80"
                                 alt="Kampala"
                                 className="w-full h-full object-cover"
                             />
                             <div className={`absolute inset-0 flex items-center justify-center ${isDark ? "bg-[#181b34]/70" : "bg-[#181b34]/50"}`}>
                                 <div className="text-center">
                                     <FiMapPin className="text-[#f5c518] mx-auto mb-2" size={28} />
-                                    <p className="text-white font-semibold">Kampala, Uganda</p>
-                                    <p className="text-white/70 text-xs mt-1">1017 Washington Ave, Kampala</p>
+                                    <p className="text-white font-semibold">Ntinda, Kampala</p>
+                                    <p className="text-white/70 text-xs mt-1">Bukenya Mall RM16 — Plot 2 Kimera Road</p>
                                 </div>
                             </div>
                         </div>

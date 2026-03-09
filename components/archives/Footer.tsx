@@ -1,11 +1,13 @@
 "use client";
+
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { FiInstagram, FiFacebook, FiTwitter, FiLinkedin, FiYoutube } from "react-icons/fi";
 
 const footerLinks = {
-    // Only sections/links we actually have on the site so far
-    "Quick Links": ["Home", "About", "Services", "Projects", "Contact"],
+    Agency: ["About Us", "Our Team", "Careers", "Press"],
+    Services: ["Residential Finishing", "Commercial Projects", "Renovation", "Interior & Exterior Works"],
+    "Quick Links": ["Projects", "Blog", "Contact", "Consultation"],
     // Help: ["Help Center", "Documentation", "Support"],
 };
 
@@ -18,22 +20,25 @@ const socials = [
 ];
 
 export default function Footer() {
+
     return (
         <footer className="bg-neutral-100 dark:bg-[#181B34] text-[#181B34] dark:text-white">
             {/* Top section */}
-            <div className="max-w-7xl mx-auto px-6 lg:px-12 pt-10 pb-8">
-                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-8">
+            <div className="max-w-7xl mx-auto px-6 lg:px-12 pt-20 pb-16">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-16 text-center lg:text-left">
+
                     {/* Brand */}
-                    <div className="flex-shrink-0">
-                        {/* Logo */}
-                        <a href="#home" className="flex items-center justify-center lg:justify-start mb-4">
+                    <div className="max-w-sm">
+
+                        {/* Logo — sits on the white left side */}
+                        <a href="#home" className="flex items-center justify-center lg:justify-start mb-6">
                             {/* Light mode logo */}
                             <Image
                                 src="/logos/yuri-white-bg-removebg.png"
                                 alt="Yuri Perfections"
                                 width={224}
                                 height={224}
-                                className="h-20 w-20 object-contain dark:hidden"
+                                className="h-28 w-28 object-contain dark:hidden"
                                 priority
                                 quality={100}
                             />
@@ -43,11 +48,15 @@ export default function Footer() {
                                 alt="Yuri Perfections"
                                 width={224}
                                 height={224}
-                                className="h-20 w-20 object-contain hidden dark:block"
+                                className="h-28 w-28 object-contain hidden dark:block"
                                 priority
                                 quality={100}
                             />
                         </a>
+
+                        <p className="text-sm font-light leading-relaxed mb-6 text-neutral-600 dark:text-white/60">
+                            At Yuri Perfections, we specialize in high-quality interior and exterior finishing solutions for residential and commercial spaces across Uganda. We combine precision, craftsmanship, and attention to detail to deliver refined spaces built to last.
+                        </p>
 
                         {/* Socials */}
                         <div className="flex gap-3 justify-center lg:justify-start">
@@ -65,19 +74,18 @@ export default function Footer() {
                         </div>
                     </div>
 
-                    {/* Links */}
-                    <div className="flex items-center justify-center md:justify-end flex-wrap gap-10">
+                    <div className="w-full flex items-center justify-center lg:justify-between flex-wrap gap-3 text-center lg:text-left">
+                        {/* Links */}
                         {Object.entries(footerLinks).map(([heading, links]) => (
-                            <div key={heading}>
-                                <h4 className="text-xs tracking-[0.25em] uppercase font-medium mb-4 text-neutral-700 dark:text-white/80 text-center md:text-left">
+                            <div key={heading} className="min-w-[160px] mt-3">
+                                <h4 className="text-xs tracking-[0.25em] uppercase font-medium mb-6 text-neutral-700 dark:text-white/80">
                                     {heading}
                                 </h4>
-                                {/* Horizontal on lg, vertical on smaller screens */}
-                                <ul className="flex flex-col lg:flex-row lg:items-center lg:gap-8 space-y-2 lg:space-y-0 text-center md:text-left">
+                                <ul className="space-y-3">
                                     {links.map((link) => (
                                         <li key={link}>
                                             <a
-                                                href={`#${link.toLowerCase()}`}
+                                                href="#"
                                                 className="text-sm font-light text-neutral-500 dark:text-white/40 hover:text-[#F5C518] dark:hover:text-[#F5C518] transition-colors"
                                             >
                                                 {link}
@@ -88,10 +96,11 @@ export default function Footer() {
                             </div>
                         ))}
                     </div>
+
                 </div>
 
                 {/* Bottom bar */}
-                <div className="mt-8 pt-6 border-t border-neutral-300 dark:border-white/5 flex flex-col sm:flex-row items-center justify-between gap-2 text-center sm:text-left">
+                <div className="mt-16 pt-8 border-t border-neutral-300 dark:border-white/5 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
                     <p className="text-xs text-neutral-500 dark:text-white/25">
                         © {new Date().getFullYear()} Yuri Perfections. All rights reserved. Kampala, Uganda.
                     </p>
@@ -100,6 +109,6 @@ export default function Footer() {
                     </p>
                 </div>
             </div>
-        </footer >
+        </footer>
     );
 }
