@@ -6,6 +6,8 @@ import { useTheme } from "@/providers/ThemeProvider";
 import { FiSun, FiMoon, FiMenu, FiX } from "react-icons/fi";
 import Image from "next/image";
 
+import { usePathname } from "next/navigation";
+
 const navLinks = [
     { label: "Home", href: "#home" },
     { label: "About", href: "#about" },
@@ -19,6 +21,8 @@ export default function Navbar() {
     const [menuOpen, setMenuOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
     const [activeSection, setActiveSection] = useState("home");
+
+    const pathname = usePathname();
 
     useEffect(() => {
         const onResize = () => { if (window.innerWidth >= 768) setMenuOpen(false); };
@@ -58,6 +62,10 @@ export default function Navbar() {
 
         return () => observers.forEach((obs) => obs.disconnect());
     }, []);
+
+    // ─── Determine if we are on the homepage ───
+    const isHomePage = pathname === "/" || pathname === "/#home";
+    const isProjectPage = pathname === "/projects" || pathname.startsWith("/projects/");
 
     return (
         <>
@@ -105,11 +113,17 @@ export default function Navbar() {
                     <div className="hidden md:flex items-center gap-8">
                         {navLinks.map((link) => {
                             const id = link.href.replace("#", "");
-                            const isActive = activeSection === id;
+                            const isActive = isProjectPage
+                                ? link.href === "#projects"  // highlight "Projects" on project detail pages
+                                : activeSection === id;
+
+                            // ─── Fix links to scroll to homepage sections if not on homepage ───
+                            const href = isHomePage ? link.href : `/${link.href}`;
+
                             return (
                                 <a
                                     key={link.label}
-                                    href={link.href}
+                                    href={href}
                                     className={`text-[11px] font-semibold tracking-[0.18em] uppercase font-['Poppins'] transition-colors duration-200 relative group
                                         ${isActive
                                             ? "text-[#181B34] dark:text-[#F5C518]"
@@ -170,11 +184,17 @@ export default function Navbar() {
                         <div className="flex flex-col items-center px-6 pt-6">
                             {navLinks.map((link, i) => {
                                 const id = link.href.replace("#", "");
-                                const isActive = activeSection === id;
+                                const isActive = isProjectPage
+                                    ? link.href === "#projects"
+                                    : activeSection === id;
+
+                                // ─── Fix links for mobile too ───
+                                const href = isHomePage ? link.href : `/${link.href}`;
+
                                 return (
                                     <motion.a
                                         key={link.label}
-                                        href={link.href}
+                                        href={href}
                                         initial={{ opacity: 0, x: 18 }}
                                         animate={{ opacity: 1, x: 0 }}
                                         transition={{ delay: i * 0.055 }}
