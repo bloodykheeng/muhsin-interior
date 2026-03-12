@@ -3,11 +3,19 @@
 import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 
+// const slides = [
+//     "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=1600&q=90",
+//     "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1600&q=90",
+//     "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=1600&q=90",
+// ];
+
 const slides = [
-    "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=1600&q=90",
-    "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1600&q=90",
-    "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=1600&q=90",
+    "/yuri/cardboard.jpg",
+    "/yuri/ceil-white.jpg",
+    "/yuri/ceil.jp.jpg",
+    // "/yuri/yuri-white-bg.jpg",
 ];
+
 
 export default function Hero() {
     const [current, setCurrent] = useState(0);
