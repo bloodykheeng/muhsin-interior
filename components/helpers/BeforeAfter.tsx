@@ -1,14 +1,9 @@
 "use client";
 
-import React, { useReducer, useRef, useCallback } from 'react'
+import React, { useReducer, useRef, useCallback, useEffect } from 'react'
 
-type State = {
-    rangeValue: number
-}
-
-type Action =
-    | { type: 'change'; payload: number }
-    | { type: 'move'; payload: number }
+type State = { rangeValue: number }
+type Action = { type: 'change'; payload: number } | { type: 'move'; payload: number }
 
 function reducer(state: State, action: Action): State {
     switch (action.type) {
@@ -29,9 +24,9 @@ interface Props {
     beforeImage: string
     afterImage: string
     /**
-     * "drag"        – default: only dragging the center button moves the slider
-     * "click"       – clicking anywhere on the image jumps the slider to that position
-     * "hover"       – hovering over the image moves the slider (original pointerMove behavior)
+     * "drag"  – default: only dragging the center button moves the slider
+     * "click" – clicking/dragging anywhere on the image moves the slider
+     * "hover" – hovering moves the slider
      */
     mode?: 'drag' | 'click' | 'hover'
     onChange?: (value: number) => void
@@ -65,18 +60,58 @@ export function BeforeAfter({
 }: Props) {
     const [{ rangeValue }, dispatch] = useReducer(reducer, { rangeValue: 50 })
     const containerRef = useRef<HTMLDivElement>(null)
+    const buttonRef = useRef<HTMLDivElement>(null)
     const isDragging = useRef(false)
 
-    // Shared helper: compute % from a clientX within the container
     const clientXToPercent = useCallback((clientX: number): number => {
         if (!containerRef.current) return 50
         const { left, width } = containerRef.current.getBoundingClientRect()
         return ((clientX - left) / width) * 100
     }, [])
 
-    // ── DRAG mode handlers (attached to the button) ──────────────────────────
-    const handleButtonPointerDown = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+    const applyPercent = useCallback((pct: number) => {
+        dispatch({ type: 'move', payload: pct })
+        onChange?.(Math.min(100, Math.max(0, Math.round(pct))))
+    }, [onChange])
+
+    // ── Attach non-passive touch listeners to the BUTTON only ──────────────
+    // This lets us call preventDefault() to stop scroll ONLY while the user
+    // is actively dragging the handle. The rest of the page scrolls freely.
+    useEffect(() => {
         if (mode !== 'drag') return
+        const btn = buttonRef.current
+        if (!btn) return
+
+        const onTouchStart = (e: TouchEvent) => {
+            isDragging.current = true
+            e.preventDefault() // prevent scroll starting when finger lands on handle
+        }
+
+        const onTouchMove = (e: TouchEvent) => {
+            if (!isDragging.current) return
+            e.preventDefault() // prevent scroll while dragging handle horizontally
+            const touch = e.touches[0]
+            applyPercent(clientXToPercent(touch.clientX))
+        }
+
+        const onTouchEnd = () => {
+            isDragging.current = false
+        }
+
+        btn.addEventListener('touchstart', onTouchStart, { passive: false })
+        btn.addEventListener('touchmove', onTouchMove, { passive: false })
+        btn.addEventListener('touchend', onTouchEnd)
+
+        return () => {
+            btn.removeEventListener('touchstart', onTouchStart)
+            btn.removeEventListener('touchmove', onTouchMove)
+            btn.removeEventListener('touchend', onTouchEnd)
+        }
+    }, [mode, clientXToPercent, applyPercent])
+
+    // ── DRAG mode — pointer events on button (mouse / stylus, not touch) ───
+    const handleButtonPointerDown = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+        if (mode !== 'drag' || e.pointerType === 'touch') return
         e.preventDefault()
         e.stopPropagation()
         isDragging.current = true
@@ -84,44 +119,34 @@ export function BeforeAfter({
     }, [mode])
 
     const handleButtonPointerMove = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
-        if (mode !== 'drag' || !isDragging.current) return
+        if (mode !== 'drag' || e.pointerType === 'touch' || !isDragging.current) return
         e.preventDefault()
-        const pct = clientXToPercent(e.clientX)
-        dispatch({ type: 'move', payload: pct })
-        onChange?.(Math.min(100, Math.max(0, Math.round(pct))))
-    }, [mode, clientXToPercent, onChange])
+        applyPercent(clientXToPercent(e.clientX))
+    }, [mode, clientXToPercent, applyPercent])
 
     const handleButtonPointerUp = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
-        if (mode !== 'drag') return
+        if (mode !== 'drag' || e.pointerType === 'touch') return
         isDragging.current = false
             ; (e.currentTarget as HTMLDivElement).releasePointerCapture(e.pointerId)
     }, [mode])
 
-    // ── CLICK mode handler (attached to the container) ───────────────────────
+    // ── CLICK mode — pointer events on container ────────────────────────────
     const handleContainerPointerDown = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
         if (mode !== 'click') return
-        const pct = clientXToPercent(e.clientX)
-        dispatch({ type: 'move', payload: pct })
-        onChange?.(Math.min(100, Math.max(0, Math.round(pct))))
-
-        // Also allow dragging after the initial click
+        applyPercent(clientXToPercent(e.clientX))
         isDragging.current = true
             ; (e.currentTarget as HTMLDivElement).setPointerCapture(e.pointerId)
-    }, [mode, clientXToPercent, onChange])
+    }, [mode, clientXToPercent, applyPercent])
 
     const handleContainerPointerMove = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
         if (mode === 'hover') {
-            const pct = clientXToPercent(e.clientX)
-            dispatch({ type: 'move', payload: pct })
-            onChange?.(Math.min(100, Math.max(0, Math.round(pct))))
+            applyPercent(clientXToPercent(e.clientX))
             return
         }
         if (mode === 'click' && isDragging.current) {
-            const pct = clientXToPercent(e.clientX)
-            dispatch({ type: 'move', payload: pct })
-            onChange?.(Math.min(100, Math.max(0, Math.round(pct))))
+            applyPercent(clientXToPercent(e.clientX))
         }
-    }, [mode, clientXToPercent, onChange])
+    }, [mode, clientXToPercent, applyPercent])
 
     const handleContainerPointerUp = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
         if (mode === 'click') {
@@ -130,7 +155,7 @@ export function BeforeAfter({
         }
     }, [mode])
 
-    // ── Fallback range input (used alongside drag mode for accessibility) ─────
+    // ── Keyboard / accessibility ────────────────────────────────────────────
     const handleRangeChange = useCallback((e: ChangeEvent) => {
         const val = Number(e.target.value)
         dispatch({ type: 'change', payload: val })
@@ -147,11 +172,11 @@ export function BeforeAfter({
                 position: 'relative',
                 overflow: 'hidden',
                 width: '100%',
-                minHeight: 200,          // fallback so container never collapses
+                minHeight: 200,
                 cursor: cursorStyle,
                 userSelect: 'none',
-                touchAction: 'none',
-                ...style                 // caller's height/minHeight wins
+                // ✅ No touchAction — browser handles vertical scroll freely
+                ...style
             }}
             onPointerDown={handleContainerPointerDown}
             onPointerMove={handleContainerPointerMove}
@@ -182,15 +207,18 @@ export function BeforeAfter({
                 />
             </div>
 
-            {/* After (right) image */}
-            <div className={afterClassName} style={{
-                width: '100%',
-                height: '100%',
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                ...afterStyle
-            }}>
+            {/* After (right) image — absolutely positioned so it never stretches the container */}
+            <div
+                className={afterClassName}
+                style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    width: '100%',
+                    height: '100%',
+                    ...afterStyle
+                }}
+            >
                 <img
                     src={afterImage}
                     alt="after"
@@ -214,8 +242,9 @@ export function BeforeAfter({
                 fontFamily: 'Poppins, sans-serif', pointerEvents: 'none',
             }}>After</span>
 
-            {/* Drag handle button */}
+            {/* Drag handle */}
             <div
+                ref={buttonRef}
                 className={buttonClassName}
                 onPointerDown={handleButtonPointerDown}
                 onPointerMove={handleButtonPointerMove}
@@ -234,8 +263,10 @@ export function BeforeAfter({
                     alignItems: 'center',
                     zIndex: 3,
                     boxShadow: '0 2px 12px rgba(0,0,0,0.25)',
-                    cursor: mode === 'drag' ? 'grab' : 'pointer',
-                    touchAction: 'none',
+                    cursor: mode === 'drag' ? 'grab' : 'inherit',
+                    // pan-y: tells browser "vertical scroll is ok here"
+                    // our non-passive touchmove listener overrides it only during drag
+                    touchAction: 'pan-y',
                     ...buttonStyle
                 }}
             >
@@ -244,7 +275,7 @@ export function BeforeAfter({
                 </svg>
             </div>
 
-            {/* Hidden range input for keyboard/accessibility */}
+            {/* Hidden range for keyboard accessibility */}
             <input
                 type="range"
                 min={0}
@@ -260,12 +291,10 @@ export function BeforeAfter({
                     height: '100%',
                     top: 0,
                     left: 0,
-                    cursor: 'inherit',
-                    zIndex: 5,
-                    pointerEvents: mode === 'drag' ? 'none' : 'none', // kept for keyboard only
+                    zIndex: 0,
+                    pointerEvents: 'none',
                 }}
                 onKeyDown={(e) => {
-                    // allow arrow key control for accessibility
                     if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.key)) {
                         const val = Number((e.target as HTMLInputElement).value)
                         dispatch({ type: 'change', payload: val })
