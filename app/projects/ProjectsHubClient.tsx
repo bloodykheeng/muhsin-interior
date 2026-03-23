@@ -114,6 +114,7 @@ export default function ProjectsHubClient() {
                                     <BeforeAfter
                                         beforeImage={firstProject.coverBefore}
                                         afterImage={firstProject.coverAfter}
+                                        mode="click"
                                         style={{ width: "100%" }}
                                     />
                                     <p className={`text-[10px] tracking-widest uppercase font-semibold font-['Poppins'] mt-3 ${isDark ? "text-white/30" : "text-slate-400"}`}>

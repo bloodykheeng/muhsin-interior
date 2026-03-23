@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useReducer } from 'react'
+import React, { useReducer, useRef, useCallback } from 'react'
 
 type State = {
     rangeValue: number
@@ -15,24 +15,28 @@ function reducer(state: State, action: Action): State {
         case 'change':
             return { rangeValue: action.payload }
         case 'move':
-            return { rangeValue: Math.round(action.payload) }
+            return { rangeValue: Math.min(100, Math.max(0, Math.round(action.payload))) }
         default:
             return state
     }
 }
 
 type ChangeEvent = React.ChangeEvent<HTMLInputElement>
-type PointerEvent = React.PointerEvent<HTMLDivElement>
+type ReactPointerEvent = React.PointerEvent<HTMLDivElement>
 type InlineStyle = React.CSSProperties
 
 interface Props {
     beforeImage: string
     afterImage: string
-    onChange?: (event: ChangeEvent) => void
-    onPointerMove?: (event: PointerEvent) => void
-    onPointerEnter?: (event: PointerEvent) => void
-    onPointerLeave?: (event: PointerEvent) => void
-    pointerMove?: boolean
+    /**
+     * "drag"        – default: only dragging the center button moves the slider
+     * "click"       – clicking anywhere on the image jumps the slider to that position
+     * "hover"       – hovering over the image moves the slider (original pointerMove behavior)
+     */
+    mode?: 'drag' | 'click' | 'hover'
+    onChange?: (value: number) => void
+    onPointerEnter?: (event: ReactPointerEvent) => void
+    onPointerLeave?: (event: ReactPointerEvent) => void
     className?: string
     beforeClassName?: string
     afterClassName?: string
@@ -46,11 +50,10 @@ interface Props {
 export function BeforeAfter({
     beforeImage,
     afterImage,
+    mode = 'drag',
     onChange,
-    onPointerMove,
     onPointerEnter,
     onPointerLeave,
-    pointerMove = false,
     className = 'before-after-slider',
     beforeClassName = 'before',
     afterClassName = 'after',
@@ -61,44 +64,102 @@ export function BeforeAfter({
     buttonStyle
 }: Props) {
     const [{ rangeValue }, dispatch] = useReducer(reducer, { rangeValue: 50 })
+    const containerRef = useRef<HTMLDivElement>(null)
+    const isDragging = useRef(false)
 
-    const handleChange = (event: ChangeEvent) => {
-        dispatch({ type: 'change', payload: Number(event.target.value) })
-        if (onChange) onChange(event)
-    }
+    // Shared helper: compute % from a clientX within the container
+    const clientXToPercent = useCallback((clientX: number): number => {
+        if (!containerRef.current) return 50
+        const { left, width } = containerRef.current.getBoundingClientRect()
+        return ((clientX - left) / width) * 100
+    }, [])
 
-    const handlePointerMove = (event: PointerEvent) => {
-        const { clientX, currentTarget } = event
-        const { left, width } = currentTarget.getBoundingClientRect()
-        const positionX = clientX - left
-        if (positionX >= 0)
-            dispatch({ type: 'move', payload: (positionX / width) * 100 })
-        if (onPointerMove) onPointerMove(event)
-    }
+    // ── DRAG mode handlers (attached to the button) ──────────────────────────
+    const handleButtonPointerDown = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+        if (mode !== 'drag') return
+        e.preventDefault()
+        e.stopPropagation()
+        isDragging.current = true
+            ; (e.currentTarget as HTMLDivElement).setPointerCapture(e.pointerId)
+    }, [mode])
 
-    const handlePointerEnter = (event: PointerEvent) => {
-        if (onPointerEnter) onPointerEnter(event)
-    }
+    const handleButtonPointerMove = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+        if (mode !== 'drag' || !isDragging.current) return
+        e.preventDefault()
+        const pct = clientXToPercent(e.clientX)
+        dispatch({ type: 'move', payload: pct })
+        onChange?.(Math.min(100, Math.max(0, Math.round(pct))))
+    }, [mode, clientXToPercent, onChange])
 
-    const handlePointerLeave = (event: PointerEvent) => {
-        if (onPointerLeave) onPointerLeave(event)
-    }
+    const handleButtonPointerUp = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+        if (mode !== 'drag') return
+        isDragging.current = false
+            ; (e.currentTarget as HTMLDivElement).releasePointerCapture(e.pointerId)
+    }, [mode])
+
+    // ── CLICK mode handler (attached to the container) ───────────────────────
+    const handleContainerPointerDown = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+        if (mode !== 'click') return
+        const pct = clientXToPercent(e.clientX)
+        dispatch({ type: 'move', payload: pct })
+        onChange?.(Math.min(100, Math.max(0, Math.round(pct))))
+
+        // Also allow dragging after the initial click
+        isDragging.current = true
+            ; (e.currentTarget as HTMLDivElement).setPointerCapture(e.pointerId)
+    }, [mode, clientXToPercent, onChange])
+
+    const handleContainerPointerMove = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+        if (mode === 'hover') {
+            const pct = clientXToPercent(e.clientX)
+            dispatch({ type: 'move', payload: pct })
+            onChange?.(Math.min(100, Math.max(0, Math.round(pct))))
+            return
+        }
+        if (mode === 'click' && isDragging.current) {
+            const pct = clientXToPercent(e.clientX)
+            dispatch({ type: 'move', payload: pct })
+            onChange?.(Math.min(100, Math.max(0, Math.round(pct))))
+        }
+    }, [mode, clientXToPercent, onChange])
+
+    const handleContainerPointerUp = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+        if (mode === 'click') {
+            isDragging.current = false
+                ; (e.currentTarget as HTMLDivElement).releasePointerCapture(e.pointerId)
+        }
+    }, [mode])
+
+    // ── Fallback range input (used alongside drag mode for accessibility) ─────
+    const handleRangeChange = useCallback((e: ChangeEvent) => {
+        const val = Number(e.target.value)
+        dispatch({ type: 'change', payload: val })
+        onChange?.(val)
+    }, [onChange])
+
+    const cursorStyle = mode === 'hover' ? 'col-resize' : 'default'
 
     return (
         <div
+            ref={containerRef}
             className={className}
             style={{
                 position: 'relative',
                 overflow: 'hidden',
                 width: '100%',
-                cursor: 'e-resize',
+                minHeight: 200,          // fallback so container never collapses
+                cursor: cursorStyle,
                 userSelect: 'none',
-                ...style
+                touchAction: 'none',
+                ...style                 // caller's height/minHeight wins
             }}
-            onPointerMove={pointerMove ? handlePointerMove : undefined}
-            onPointerEnter={handlePointerEnter}
-            onPointerLeave={handlePointerLeave}
+            onPointerDown={handleContainerPointerDown}
+            onPointerMove={handleContainerPointerMove}
+            onPointerUp={handleContainerPointerUp}
+            onPointerEnter={onPointerEnter}
+            onPointerLeave={onPointerLeave}
         >
+            {/* Before (left) image */}
             <div
                 className={beforeClassName}
                 style={{
@@ -113,76 +174,105 @@ export function BeforeAfter({
                     ...beforeStyle
                 }}
             >
-                <img src={beforeImage} alt="before" style={{ height: '100%', width: '100%', objectFit: 'cover' }} />
+                <img
+                    src={beforeImage}
+                    alt="before"
+                    draggable={false}
+                    style={{ height: '100%', width: '100%', objectFit: 'cover', display: 'block', pointerEvents: 'none' }}
+                />
             </div>
 
-            <div className={afterClassName} style={{ width: '100%', ...afterStyle }}>
-                <img src={afterImage} alt="after" style={{ maxWidth: '100%', width: '100%', display: 'block', objectFit: 'cover' }} />
+            {/* After (right) image */}
+            <div className={afterClassName} style={{
+                width: '100%',
+                height: '100%',
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                ...afterStyle
+            }}>
+                <img
+                    src={afterImage}
+                    alt="after"
+                    draggable={false}
+                    style={{ width: '100%', height: '100%', display: 'block', objectFit: 'cover', pointerEvents: 'none' }}
+                />
             </div>
 
-            {/* Before / After labels */}
+            {/* Labels */}
             <span style={{
-                position: 'absolute', top: 12, left: 12, zIndex: 2,
+                position: 'absolute', top: 12, left: 12, zIndex: 4,
                 fontSize: 9, fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase',
                 color: '#fff', background: 'rgba(0,0,0,0.5)', padding: '3px 8px',
                 backdropFilter: 'blur(4px)', fontFamily: 'Poppins, sans-serif',
                 pointerEvents: 'none',
             }}>Before</span>
             <span style={{
-                position: 'absolute', top: 12, right: 12, zIndex: 2,
+                position: 'absolute', top: 12, right: 12, zIndex: 4,
                 fontSize: 9, fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase',
                 color: '#181B34', background: '#F5C518', padding: '3px 8px',
                 fontFamily: 'Poppins, sans-serif', pointerEvents: 'none',
             }}>After</span>
 
-            {!pointerMove && (
-                <>
-                    <input
-                        type="range"
-                        min={0}
-                        max={100}
-                        value={rangeValue}
-                        name="slider"
-                        onChange={handleChange}
-                        style={{
-                            appearance: 'none',
-                            backgroundColor: 'transparent',
-                            width: '100%',
-                            height: '100%',
-                            position: 'absolute',
-                            top: '50%',
-                            left: '50%',
-                            transform: 'translate(-50%, -50%)',
-                            cursor: 'inherit',
-                            zIndex: 3,
-                        }}
-                    />
-                    <div
-                        className={buttonClassName}
-                        style={{
-                            backgroundColor: '#fff',
-                            pointerEvents: 'none',
-                            position: 'absolute',
-                            top: '50%',
-                            left: `${rangeValue}%`,
-                            transform: 'translate(-50%, -50%)',
-                            borderRadius: '50%',
-                            width: 36,
-                            height: 36,
-                            display: 'flex',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            zIndex: 2,
-                            boxShadow: '0 2px 12px rgba(0,0,0,0.25)',
-                            ...buttonStyle
-                        }}
-                    >
-                        <svg fill="#333" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24">
-                            <path d="M24,12l-5.7-5.7V11c-3.7,0-9,0-12.6,0V6.3L0,12l5.8,5.7V13c3.6,0,8.9,0,12.5,0v4.7L24,12z" />
-                        </svg>
-                    </div>
-                </>
-            )}
+            {/* Drag handle button */}
+            <div
+                className={buttonClassName}
+                onPointerDown={handleButtonPointerDown}
+                onPointerMove={handleButtonPointerMove}
+                onPointerUp={handleButtonPointerUp}
+                style={{
+                    backgroundColor: '#fff',
+                    position: 'absolute',
+                    top: '50%',
+                    left: `${rangeValue}%`,
+                    transform: 'translate(-50%, -50%)',
+                    borderRadius: '50%',
+                    width: 36,
+                    height: 36,
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    zIndex: 3,
+                    boxShadow: '0 2px 12px rgba(0,0,0,0.25)',
+                    cursor: mode === 'drag' ? 'grab' : 'pointer',
+                    touchAction: 'none',
+                    ...buttonStyle
+                }}
+            >
+                <svg fill="#333" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24">
+                    <path d="M24,12l-5.7-5.7V11c-3.7,0-9,0-12.6,0V6.3L0,12l5.8,5.7V13c3.6,0,8.9,0,12.5,0v4.7L24,12z" />
+                </svg>
+            </div>
+
+            {/* Hidden range input for keyboard/accessibility */}
+            <input
+                type="range"
+                min={0}
+                max={100}
+                value={rangeValue}
+                name="slider"
+                onChange={handleRangeChange}
+                aria-label="Image comparison slider"
+                style={{
+                    position: 'absolute',
+                    opacity: 0,
+                    width: '100%',
+                    height: '100%',
+                    top: 0,
+                    left: 0,
+                    cursor: 'inherit',
+                    zIndex: 5,
+                    pointerEvents: mode === 'drag' ? 'none' : 'none', // kept for keyboard only
+                }}
+                onKeyDown={(e) => {
+                    // allow arrow key control for accessibility
+                    if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.key)) {
+                        const val = Number((e.target as HTMLInputElement).value)
+                        dispatch({ type: 'change', payload: val })
+                        onChange?.(val)
+                    }
+                }}
+            />
         </div>
     )
 }

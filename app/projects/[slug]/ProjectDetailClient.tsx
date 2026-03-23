@@ -52,6 +52,7 @@ function Lightbox({
                     <BeforeAfter
                         beforeImage={pair.before}
                         afterImage={pair.after}
+                        mode="click"
                         style={{ width: "100%" }}
                         buttonStyle={{ width: 44, height: 44 }}
                     />
@@ -203,6 +204,7 @@ export default function ProjectDetailClient({ slug }: { slug: string }) {
                                     <BeforeAfter
                                         beforeImage={pair.before}
                                         afterImage={pair.after}
+                                        mode="click"
                                         style={{ width: "100%" }}
                                         buttonStyle={{ width: 44, height: 44 }}
                                     />
