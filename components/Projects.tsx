@@ -40,7 +40,7 @@ function ProjectCard({
             <BeforeAfter
                 beforeImage={project.coverBefore}
                 afterImage={project.coverAfter}
-                mode="click"
+                mode="drag"
                 style={{ height: 208 }}
                 beforeStyle={{ height: 208 }}
                 afterStyle={{ height: 208 }}
@@ -173,7 +173,7 @@ export default function Projects() {
                             <BeforeAfter
                                 beforeImage={selected.coverBefore}
                                 afterImage={selected.coverAfter}
-                                mode="click"
+                                mode="drag"
                                 style={{ height: '100%', minHeight: 400, width: '100%' }}
                                 beforeStyle={{ height: '100%' }}
                                 afterStyle={{ height: '100%' }}
