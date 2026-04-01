@@ -12,7 +12,7 @@ export type HeroSlide = {
 
 export const HERO_SLIDES_QUERY_KEY = ["hero_slides", "active"];
 
-// ── Fetch active slides ───────────────────────────────────────────────────────
+// ── Client-side fetch ─────────────────────────────────────────────────────────
 export async function getActiveHeroSlides(): Promise<HeroSlide[]> {
     const supabase = createClient();
 
@@ -27,8 +27,8 @@ export async function getActiveHeroSlides(): Promise<HeroSlide[]> {
     return data ?? [];
 }
 
-// ── Realtime subscription — call once, pass your queryClient in ───────────────
-export function subscribeToHeroSlides(queryClient: QueryClient) {
+// ── Realtime subscription ─────────────────────────────────────────────────────
+export function subscribeToHeroSlides(queryClient: QueryClient): () => void {
     const supabase = createClient();
 
     const channel = supabase
@@ -36,7 +36,7 @@ export function subscribeToHeroSlides(queryClient: QueryClient) {
         .on(
             "postgres_changes",
             {
-                event: "*", // INSERT | UPDATE | DELETE
+                event: "*",
                 schema: "public",
                 table: "hero_slides",
             },
@@ -46,7 +46,6 @@ export function subscribeToHeroSlides(queryClient: QueryClient) {
         )
         .subscribe();
 
-    // Return cleanup function so the component can unsubscribe on unmount
     return () => {
         supabase.removeChannel(channel);
     };
