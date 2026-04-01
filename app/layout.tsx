@@ -3,6 +3,7 @@ import { Poppins } from "next/font/google";
 import "./globals.css";
 
 import { ThemeProvider } from "@/providers/ThemeProvider";
+import TanstackProvider from "@/providers/TanstackProvider";
 import { cookies } from "next/headers";
 
 const poppins = Poppins({
@@ -33,9 +34,11 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body className={`${poppins.variable} antialiased`}>
-        <ThemeProvider defaultTheme={defaultTheme?.value}>
-          {children}
-        </ThemeProvider>
+        <TanstackProvider>
+          <ThemeProvider defaultTheme={defaultTheme?.value}>
+            {children}
+          </ThemeProvider>
+        </TanstackProvider>
       </body>
     </html>
   );
