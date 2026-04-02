@@ -96,7 +96,7 @@ export default function Footer() {
                         © {new Date().getFullYear()} Yuri Perfections. All rights reserved. Kampala, Uganda.
                     </p>
                     <p className="text-xs text-neutral-400 dark:text-white/20">
-                        bloodykheeng
+                        Precision Craftsmanship.
                     </p>
                 </div>
             </div>
