@@ -6,14 +6,14 @@ import { useTheme } from "@/providers/ThemeProvider";
 import { FiMapPin, FiPhone, FiMail, FiSend } from "react-icons/fi";
 import { FaWhatsapp } from "react-icons/fa";
 
-const WHATSAPP_NUMBER = "256700000000"; // ← update this
+const WHATSAPP_NUMBER = "256394837953"; // ← update this
 const WHATSAPP_DEFAULT_MSG = encodeURIComponent("Hello! I'd like to enquire about your services.");
 const EMAIL_ADDRESS = "hello@yuriperfections.ug"; // ← update this
 const EMAIL_PREFILL_SUBJECT = encodeURIComponent("Project Enquiry – Yuri Perfections");
 const EMAIL_PREFILL_BODY = encodeURIComponent(
     "Hello Yuri Perfections,\n\nI would like to discuss a project with you.\n\nPlease let me know your availability.\n\nBest regards,"
 );
-const PHONE_NUMBER = "+256700000000"; // ← update this
+const PHONE_NUMBER = "+256394837953"; // ← update this
 const MAPS_ADDRESS = encodeURIComponent("Bukenya Mall, Ntinda, Plot 2 Kimera Road, Kampala, Uganda");
 
 export default function Contact() {
