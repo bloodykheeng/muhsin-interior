@@ -15,6 +15,7 @@ const nextConfig: NextConfig = {
     // removeConsole: process.env.NODE_ENV === "production" ? { exclude: ["error"] } : false
   },
   images: {
+    qualities: [75, 85, 90, 100],
     remotePatterns: [
       {
         protocol: 'https',
@@ -25,7 +26,8 @@ const nextConfig: NextConfig = {
         hostname: 'iykrvxusnnudoskkwish.supabase.co',
       },
     ],
-    // This is needed to allow private IPs like 127.0.0.1 in development
+    // Skip server-side image optimization in dev — avoids timeout fetching large remote images.
+    // In production the pipeline runs normally and results are cached.
     unoptimized: process.env.NODE_ENV === 'development',
   },
 };

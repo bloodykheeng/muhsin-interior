@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { motion } from "framer-motion";
 import { useTheme } from "@/providers/ThemeProvider";
 import { FiMapPin, FiPhone, FiMail, FiSend } from "react-icons/fi";
@@ -106,10 +107,14 @@ export default function Contact() {
                     >
                         {/* Map image */}
                         <div className="relative h-52 overflow-hidden">
-                            <img
-                                src="https://images.unsplash.com/photo-1653972233229-1b8c042d6d8e?q=80&w=1332&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D?w=600&q=80"
+                            <Image
+                                src="/yuri/contact/untitled-15.jpg"
                                 alt="Kampala"
-                                className="w-full h-full object-cover"
+                                fill
+                                className="object-cover"
+                                sizes="(max-width: 1024px) 100vw, 560px"
+                                quality={90}
+                                priority
                             />
                             <div className={`absolute inset-0 flex items-center justify-center ${isDark ? "bg-[#181b34]/70" : "bg-[#181b34]/50"}`}>
                                 <div className="text-center">

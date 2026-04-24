@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { motion } from "framer-motion";
 import { FiArrowRight, FiCheckCircle } from "react-icons/fi";
 
@@ -19,12 +20,20 @@ export default function About() {
 
                     {/* ── Images ── */}
                     <motion.div initial={{ opacity: 0, x: -50 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: false, amount: 0.3 }} transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }} className="relative">
-                        <div className="relative">
-                            <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=700&q=80" alt="Yuri Perfections renovation" className="w-full h-[480px] object-cover" />
+                        <div className="relative h-120">
+                            <Image
+                                // src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=700&q=80"
+                                src="/yuri/about/untitled-20.jpg"
+                                alt="Yuri Perfections renovation" fill className="object-cover" sizes="(max-width: 1024px) 100vw, 50vw" quality={90} priority />
                             {/* <img src="/yuri/about/open-door.jpg" alt="Yuri Perfections renovation" className="w-full h-[480px] object-cover" /> */}
                             {/* Floating accent image */}
                             <motion.div initial={{ opacity: 0, scale: 0.9 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: false, amount: 0.3 }} transition={{ delay: 0.4, duration: 0.7 }} className="absolute -bottom-10 -right-6 lg:-right-12 w-48 h-52 lg:w-56 lg:h-60 border-4 shadow-2xl border-white dark:border-[#181B34]">
-                                <img src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=400&q=80" alt="Interior detail" className="w-full h-full object-cover" />
+                                <div className="relative w-full h-full">
+                                    <Image
+                                        // src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=400&q=80"
+                                        src="/yuri/about/untitled.jpg"
+                                        alt="Interior detail" fill className="object-cover" sizes="224px" quality={85} />
+                                </div>
                                 {/* <img src="/yuri/about/close-in.jpg" alt="Interior detail" className="w-full h-full object-cover" /> */}
                             </motion.div>
                             {/* Years badge — gold accent */}

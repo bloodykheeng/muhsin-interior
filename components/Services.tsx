@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { motion } from "framer-motion";
 import { useTheme } from "@/providers/ThemeProvider";
 import {
@@ -17,7 +18,8 @@ const services = [
         icon: FiLayers,
         title: "Ceiling Installation & Remodeling",
         desc: "Professional ceiling installation, renovation, and remodeling — from plasterboard to decorative suspended ceilings, executed with precision.",
-        img: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80",
+        // img: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80",
+        img: "yuri/services/untitled-30.jpg",
     },
     {
         icon: FiGrid,
@@ -41,7 +43,8 @@ const services = [
         icon: FiBox,
         title: "Custom Cabinetry & Millwork",
         desc: "Bespoke cabinetry and millwork installations crafted to your exact specifications, seamlessly integrated into your space.",
-        img: "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=600&q=80",
+        // img: "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=600&q=80",
+        img: "yuri/services/IMG_6604.jpg",
     },
     {
         icon: FiSun,
@@ -105,10 +108,13 @@ export default function Services() {
                         >
                             {/* Image */}
                             <div className="relative h-52 overflow-hidden">
-                                <img
+                                <Image
                                     src={s.img}
                                     alt={s.title}
-                                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                                    fill
+                                    className="object-cover transition-transform duration-700 group-hover:scale-110"
+                                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                                    quality={85}
                                 />
                                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                                 {/* Icon badge — gold */}

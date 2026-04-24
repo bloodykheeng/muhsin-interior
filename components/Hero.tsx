@@ -108,6 +108,8 @@ export default function Hero() {
                                             fill
                                             className={`object-cover transition-opacity duration-700 ${index === current ? "opacity-100" : "opacity-0"
                                                 }`}
+                                            sizes="(max-width: 1024px) 85vw, 80vw"
+                                            quality={90}
                                             priority={index === 0}
                                         />
                                     ))}
@@ -137,6 +139,8 @@ export default function Hero() {
                                         alt={`Preview: ${slides[nextIndex].alt_text}`}
                                         fill
                                         className="object-cover shadow-xl"
+                                        sizes="(max-width: 1024px) 40vw, 50vw"
+                                        quality={90}
                                     />
                                 )}
                             </div>
