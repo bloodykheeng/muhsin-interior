@@ -25,6 +25,11 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'iykrvxusnnudoskkwish.supabase.co',
       },
+      //muhsin account hostname
+      {
+        protocol: 'https',
+        hostname: 'qqydaukcelbwezeltpit.supabase.co',
+      },
     ],
     // Skip server-side image optimization in dev — avoids timeout fetching large remote images.
     // In production the pipeline runs normally and results are cached.
