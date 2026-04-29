@@ -1,19 +1,44 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTheme } from "@/providers/ThemeProvider";
 import { FiArrowRight, FiArrowUpRight } from "react-icons/fi";
 import Link from "next/link";
 import { BeforeAfter } from "@/components/helpers/BeforeAfter";
+import { projects as staticProjects } from "@/data/projects";
+import type { Project } from "@/services/projects-service";
+import {
+    getActiveProjects,
+    subscribeToProjects,
+    PROJECTS_QUERY_KEY,
+} from "@/services/projects-service";
 
-import { projects } from "@/data/projects";
-
-// ─── Shared project data (exported so pages can import it) ───────────────────
-
-const categories = ["All", "Residential", "Commercial", "Ceiling", "Renovation"];
-
-
+// ── Convert static camelCase data → DB snake_case shape for fallback ──────────
+const FALLBACK_PROJECTS: Project[] = staticProjects.map((p) => ({
+    id: p.id,
+    slug: p.slug,
+    title: p.title,
+    style: p.style,
+    category: p.category,
+    location: p.location,
+    description: p.desc,
+    cover_before: p.coverBefore,
+    cover_after: p.coverAfter,
+    project_images: p.imgs.map((img, i) => ({
+        id: -(p.id * 100 + i),
+        project_id: p.id,
+        before: img.before,
+        after: img.after,
+        label: img.label,
+        order: i + 1,
+        created_at: "",
+    })),
+    order: p.id,
+    status: "active" as const,
+    created_at: "",
+}));
 
 // ─── Thumbnail card ───────────────────────────────────────────────────────────
 
@@ -21,12 +46,10 @@ function ProjectCard({
     project,
     isSelected,
     onClick,
-    isDark,
 }: {
-    project: (typeof projects)[0];
+    project: Project;
     isSelected: boolean;
     onClick: () => void;
-    isDark: boolean;
 }) {
     return (
         <motion.div
@@ -38,18 +61,16 @@ function ProjectCard({
                 }`}
         >
             <BeforeAfter
-                beforeImage={project.coverBefore}
-                afterImage={project.coverAfter}
+                beforeImage={project.cover_before}
+                afterImage={project.cover_after}
                 mode="drag"
                 style={{ height: 208 }}
                 beforeStyle={{ height: 208 }}
                 afterStyle={{ height: 208 }}
-
-                // 🔥 ADD THESE
                 buttonStyle={{ width: 44, height: 44 }}
             />
             {/* Gradient + title overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent pointer-events-none" />
+            <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/10 to-transparent pointer-events-none" />
             <div className="absolute bottom-0 left-0 right-0 p-4 pointer-events-none">
                 <p className="text-[#F5C518] text-[9px] tracking-widest uppercase mb-1 font-['Poppins'] font-semibold">
                     {project.style}
@@ -67,13 +88,50 @@ function ProjectCard({
 export default function Projects() {
     const { theme } = useTheme();
     const isDark = theme === "dark";
+    const queryClient = useQueryClient();
+
+    // ── Fetch projects via TanStack Query ─────────────────────────────────────
+    const { data: dbProjects, isPending, isError } = useQuery({
+        queryKey: PROJECTS_QUERY_KEY,
+        queryFn: getActiveProjects,
+    });
+
+    // ── Wire up Supabase realtime ─────────────────────────────────────────────
+    useEffect(() => {
+        const unsubscribe = subscribeToProjects(queryClient);
+        return () => unsubscribe();
+    }, [queryClient]);
+
     const [activeCategory, setActiveCategory] = useState("All");
-    const [selected, setSelected] = useState(projects[0]);
+    const [current, setCurrent] = useState(0);
+
+    // Use DB projects when available; fall back to hardcoded set
+    const projects =
+        !isPending && !isError && dbProjects && dbProjects.length > 0
+            ? dbProjects
+            : FALLBACK_PROJECTS;
+
+    // Derive categories dynamically from whatever data is loaded
+    const categories = ["All", ...Array.from(new Set(projects.map((p) => p.category)))];
+
+    // Reset to first item when the data source changes
+    useEffect(() => {
+        if (projects.length > 0) setCurrent(0);
+    }, [projects.length]);
 
     const filtered =
         activeCategory === "All"
             ? projects
             : projects.filter((p) => p.category === activeCategory);
+
+    // Keep current index in bounds when filter changes
+    useEffect(() => {
+        setCurrent(0);
+    }, [activeCategory]);
+
+    const selected = filtered[current] ?? filtered[0];
+
+    if (!selected) return null;
 
     return (
         <section
@@ -141,7 +199,7 @@ export default function Projects() {
                                 {selected.location}
                             </p>
                             <p className={`text-sm leading-relaxed font-light mb-8 font-['Poppins'] ${isDark ? "text-white/60" : "text-slate-500"}`}>
-                                {selected.desc}
+                                {selected.description}
                             </p>
                             <div className="flex flex-wrap gap-3">
                                 <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
@@ -169,10 +227,10 @@ export default function Projects() {
                         </div>
 
                         {/* Featured before/after slider */}
-                        <div className="min-h-[400px] lg:min-h-0">
+                        <div className="min-h-100 lg:min-h-0">
                             <BeforeAfter
-                                beforeImage={selected.coverBefore}
-                                afterImage={selected.coverAfter}
+                                beforeImage={selected.cover_before}
+                                afterImage={selected.cover_after}
                                 mode="drag"
                                 style={{ height: '100%', minHeight: 400, width: '100%' }}
                                 beforeStyle={{ height: '100%' }}
@@ -185,13 +243,12 @@ export default function Projects() {
 
                 {/* ── Thumbnail grid ── */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                    {filtered.map((p) => (
+                    {filtered.map((p, i) => (
                         <ProjectCard
                             key={p.id}
                             project={p}
-                            isSelected={selected.id === p.id}
-                            onClick={() => setSelected(p)}
-                            isDark={isDark}
+                            isSelected={current === i}
+                            onClick={() => setCurrent(i)}
                         />
                     ))}
                 </div>

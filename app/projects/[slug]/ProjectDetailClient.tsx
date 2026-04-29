@@ -5,19 +5,17 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useTheme } from "@/providers/ThemeProvider";
 import Link from "next/link";
 import { FiArrowLeft, FiArrowRight, FiX, FiMaximize2 } from "react-icons/fi";
-import { projects } from "@/data/projects";
 import { BeforeAfter } from "@/components/helpers/BeforeAfter";
+import type { Project, ProjectImage } from "@/services/projects-service";
 
 // ─── Lightbox ─────────────────────────────────────────────────────────────────
 
 function Lightbox({
     pair,
     onClose,
-    isDark,
 }: {
-    pair: (typeof projects)[0]["imgs"][0];
+    pair: ProjectImage;
     onClose: () => void;
-    isDark: boolean;
 }) {
     useEffect(() => {
         const onKey = (e: KeyboardEvent) => {
@@ -33,7 +31,7 @@ function Lightbox({
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="fixed inset-0 z-[100] bg-black/92 flex items-center justify-center p-4"
+                className="fixed inset-0 z-100 bg-black/92 flex items-center justify-center p-4"
                 onClick={onClose}
             >
                 <motion.div
@@ -69,31 +67,33 @@ function Lightbox({
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
-export default function ProjectDetailClient({ slug }: { slug: string }) {
+export default function ProjectDetailClient({
+    project,
+    siblings,
+}: {
+    project: Project;
+    siblings: Project[];
+}) {
     const { theme } = useTheme();
     const isDark = theme === "dark";
-    const project = projects.find((p) => p.slug === slug)!;
-    const [lightboxPair, setLightboxPair] = useState<(typeof projects)[0]["imgs"][0] | null>(null);
-
-    // Other projects (siblings)
-    const siblings = projects.filter((p) => p.slug !== slug).slice(0, 3);
+    const [lightboxPair, setLightboxPair] = useState<ProjectImage | null>(null);
 
     return (
         <div className={isDark ? "bg-[#181B34]" : "bg-white"}>
 
             {/* Lightbox */}
             {lightboxPair && (
-                <Lightbox pair={lightboxPair} onClose={() => setLightboxPair(null)} isDark={isDark} />
+                <Lightbox pair={lightboxPair} onClose={() => setLightboxPair(null)} />
             )}
 
             {/* ── Hero ── */}
             <section className="relative h-[55vh] min-h-[380px] overflow-hidden flex items-end">
                 <img
-                    src={project.coverAfter}
+                    src={project.cover_after}
                     alt={project.title}
                     className="absolute inset-0 w-full h-full object-cover"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-black/10" />
+                <div className="absolute inset-0 bg-linear-to-t from-black/85 via-black/30 to-black/10" />
                 <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-12 pb-14 w-full">
                     <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }}>
                         {/* Breadcrumb */}
@@ -133,7 +133,7 @@ export default function ProjectDetailClient({ slug }: { slug: string }) {
                             </span>
                         </div>
                         <p className={`text-base leading-relaxed font-['Poppins'] font-light ${isDark ? "text-white/70" : "text-slate-600"}`}>
-                            {project.desc}
+                            {project.description}
                         </p>
                     </div>
                     <div className={`p-6 ${isDark ? "bg-[#0f1124]" : "bg-[#F0F3FF]"}`}>
@@ -142,10 +142,10 @@ export default function ProjectDetailClient({ slug }: { slug: string }) {
                         </p>
                         <div className="space-y-3">
                             {[
-                                { label: "Category", value: project.category },
-                                { label: "Style", value: project.style },
-                                { label: "Location", value: project.location },
-                                { label: "Transformations", value: `${project.imgs.length} space${project.imgs.length > 1 ? "s" : ""}` },
+                                { label: "Category",        value: project.category },
+                                { label: "Style",           value: project.style },
+                                { label: "Location",        value: project.location },
+                                { label: "Transformations", value: `${project.project_images.length} space${project.project_images.length !== 1 ? "s" : ""}` },
                             ].map(({ label, value }) => (
                                 <div
                                     key={label}
@@ -181,9 +181,9 @@ export default function ProjectDetailClient({ slug }: { slug: string }) {
                     </motion.div>
 
                     <div className="space-y-10">
-                        {project.imgs.map((pair, i) => (
+                        {project.project_images.map((pair, i) => (
                             <motion.div
-                                key={i}
+                                key={pair.id}
                                 initial={{ opacity: 0, y: 30 }}
                                 whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ once: true, amount: 0.2 }}
@@ -208,7 +208,6 @@ export default function ProjectDetailClient({ slug }: { slug: string }) {
                                         style={{ width: "100%" }}
                                         buttonStyle={{ width: 44, height: 44 }}
                                     />
-                                    {/* Expand to lightbox */}
                                     <button
                                         onClick={() => setLightboxPair(pair)}
                                         className="absolute top-4 left-1/2 -translate-x-1/2 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center gap-2 px-4 py-2 bg-black/60 text-white text-[10px] font-bold font-['Poppins'] tracking-widest uppercase backdrop-blur-sm hover:bg-[#F5C518] hover:text-[#181B34]"
@@ -272,11 +271,11 @@ export default function ProjectDetailClient({ slug }: { slug: string }) {
                                 >
                                     <Link href={`/projects/${p.slug}`} className="group block relative overflow-hidden">
                                         <img
-                                            src={p.coverAfter}
+                                            src={p.cover_after}
                                             alt={p.title}
                                             className="w-full h-52 object-cover transition-transform duration-500 group-hover:scale-105"
                                         />
-                                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                                        <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-transparent" />
                                         <div className="absolute bottom-0 left-0 right-0 p-4">
                                             <p className="text-[#F5C518] text-[9px] tracking-widest uppercase mb-1 font-['Poppins'] font-semibold">
                                                 {p.style}

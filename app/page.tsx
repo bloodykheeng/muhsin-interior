@@ -7,17 +7,31 @@ import Projects from "@/components/Projects";
 import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
 import ScrollToTop from "@/components/ScrollToTop";
-import { getActiveHeroSlidesServer } from "@/services/hero-slides-server-service"; // ← server file
+import { getActiveHeroSlidesServer } from "@/services/hero-slides-server-service";
 import { HERO_SLIDES_QUERY_KEY } from "@/services/hero-slides-service";
+import { getActiveServicesServer } from "@/services/services-server-service";
+import { SERVICES_QUERY_KEY } from "@/services/services-service";
+import { getActiveProjectsServer } from "@/services/projects-server-service";
+import { PROJECTS_QUERY_KEY } from "@/services/projects-service";
 
 export default async function Home() {
-  // ── Prefetch on the server ──────────────────────────────────────────────────
+  // ── Prefetch all dynamic sections on the server ───────────────────────────
   const queryClient = new QueryClient();
 
-  await queryClient.prefetchQuery({
-    queryKey: HERO_SLIDES_QUERY_KEY,
-    queryFn: getActiveHeroSlidesServer,
-  });
+  await Promise.all([
+    queryClient.prefetchQuery({
+      queryKey: HERO_SLIDES_QUERY_KEY,
+      queryFn: getActiveHeroSlidesServer,
+    }),
+    queryClient.prefetchQuery({
+      queryKey: SERVICES_QUERY_KEY,
+      queryFn: getActiveServicesServer,
+    }),
+    queryClient.prefetchQuery({
+      queryKey: PROJECTS_QUERY_KEY,
+      queryFn: getActiveProjectsServer,
+    }),
+  ]);
 
   return (
     // ── Dehydrate cache and pass it to the client ─────────────────────────────

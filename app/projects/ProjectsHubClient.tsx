@@ -1,58 +1,111 @@
 "use client";
 
+import { useEffect } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { useTheme } from "@/providers/ThemeProvider";
 import Link from "next/link";
 import { FiArrowRight } from "react-icons/fi";
-import { projects } from "@/data/projects";
 import { BeforeAfter } from "@/components/helpers/BeforeAfter";
+import { projects as staticProjects } from "@/data/projects";
+import type { Project } from "@/services/projects-service";
+import {
+    getActiveProjects,
+    subscribeToProjects,
+    PROJECTS_QUERY_KEY,
+} from "@/services/projects-service";
 
-// ─── Category groups ──────────────────────────────────────────────────────────
+// ── Fallback ──────────────────────────────────────────────────────────────────
+const FALLBACK_PROJECTS: Project[] = staticProjects.map((p) => ({
+    id: p.id,
+    slug: p.slug,
+    title: p.title,
+    style: p.style,
+    category: p.category,
+    location: p.location,
+    description: p.desc,
+    cover_before: p.coverBefore,
+    cover_after: p.coverAfter,
+    project_images: p.imgs.map((img, i) => ({
+        id: -(p.id * 100 + i),
+        project_id: p.id,
+        before: img.before,
+        after: img.after,
+        label: img.label,
+        order: i + 1,
+        created_at: "",
+    })),
+    order: p.id,
+    status: "active" as const,
+    created_at: "",
+}));
 
-const categoryGroups = [
-    {
-        key: "Residential",
+// ── Hardcoded category metadata (label + tagline) ─────────────────────────────
+const CATEGORY_META: Record<string, { label: string; tagline: string }> = {
+    Residential: {
         label: "Residential Before & Afters",
         tagline: "Premium residential spaces crafted to perfection — from ceiling installations and custom cabinetry to full interior painting.",
-        projects: projects.filter((p) => p.category === "Residential"),
     },
-    {
-        key: "Commercial",
+    Commercial: {
         label: "Commercial Before & Afters",
         tagline: "Modern commercial environments built for productivity, featuring suspended ceilings, glass partitioning, and professional finishes.",
-        projects: projects.filter((p) => p.category === "Commercial"),
     },
-    {
-        key: "Renovation",
+    Renovation: {
         label: "Renovation Before & Afters",
         tagline: "Complete transformations inside and out — millwork, partitioning, terrace systems, and full interior/exterior painting.",
-        projects: projects.filter((p) => p.category === "Renovation"),
     },
-    {
-        key: "Ceiling",
+    Ceiling: {
         label: "Ceiling Before & Afters",
         tagline: "Precision ceiling systems that define the room — suspended, decorative, and custom installations.",
-        projects: projects.filter((p) => p.category === "Ceiling"),
     },
-];
+};
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export default function ProjectsHubClient() {
     const { theme } = useTheme();
     const isDark = theme === "dark";
+    const queryClient = useQueryClient();
+
+    // ── Fetch projects via TanStack Query ─────────────────────────────────────
+    const { data: dbProjects, isPending, isError } = useQuery({
+        queryKey: PROJECTS_QUERY_KEY,
+        queryFn: getActiveProjects,
+    });
+
+    // ── Wire up Supabase realtime ─────────────────────────────────────────────
+    useEffect(() => {
+        const unsubscribe = subscribeToProjects(queryClient);
+        return () => unsubscribe();
+    }, [queryClient]);
+
+    const projects =
+        !isPending && !isError && dbProjects && dbProjects.length > 0
+            ? dbProjects
+            : FALLBACK_PROJECTS;
+
+    // Build category groups dynamically from loaded data
+    const categoryKeys = Array.from(new Set(projects.map((p) => p.category)));
+    const categoryGroups = categoryKeys
+        .map((key) => ({
+            key,
+            label: CATEGORY_META[key]?.label ?? `${key} Before & Afters`,
+            tagline: CATEGORY_META[key]?.tagline ?? "",
+            projects: projects.filter((p) => p.category === key),
+        }))
+        .filter((g) => g.projects.length > 0);
 
     return (
         <div className={isDark ? "bg-[#181B34]" : "bg-white"}>
 
             {/* ── Hero ── */}
-            <section className="relative h-[50vh] min-h-[360px] overflow-hidden flex items-end">
+            <section className="relative h-[50vh] min-h-90 overflow-hidden flex items-end">
                 <img
                     src="https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=1600&q=80"
                     alt="Portfolio hero"
                     className="absolute inset-0 w-full h-full object-cover"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-black/10" />
+                <div className="absolute inset-0 bg-linear-to-t from-black/85 via-black/30 to-black/10" />
                 <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-12 pb-14 w-full">
                     <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
                         <p className="text-[#F5C518] text-xs font-semibold tracking-[0.3em] uppercase font-['Poppins'] mb-3">
@@ -92,7 +145,6 @@ export default function ProjectsHubClient() {
 
             {/* ── Category sections ── */}
             {categoryGroups.map((group, gi) => {
-                if (group.projects.length === 0) return null;
                 const firstProject = group.projects[0];
                 const isEven = gi % 2 === 0;
 
@@ -112,8 +164,8 @@ export default function ProjectsHubClient() {
                                     className={!isEven ? "lg:order-2" : ""}
                                 >
                                     <BeforeAfter
-                                        beforeImage={firstProject.coverBefore}
-                                        afterImage={firstProject.coverAfter}
+                                        beforeImage={firstProject.cover_before}
+                                        afterImage={firstProject.cover_after}
                                         mode="drag"
                                         style={{ width: "100%" }}
                                     />

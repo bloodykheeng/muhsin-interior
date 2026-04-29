@@ -4,39 +4,41 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import ScrollToTop from "@/components/ScrollToTop";
 import ProjectDetailClient from "./ProjectDetailClient";
-import { projects } from "@/data/projects";
+import { getActiveProjectsServer } from "@/services/projects-server-service";
 
 interface PageProps {
     params: Promise<{ slug: string }>;
 }
 
-// Generate static params for all project slugs
-export async function generateStaticParams() {
-    return projects.map((p) => ({ slug: p.slug }));
-}
+export const dynamic = "force-dynamic";
 
-// Dynamic metadata per project
 export async function generateMetadata({ params }: PageProps) {
     const { slug } = await params;
-    const project = projects.find((p) => p.slug === slug);
+    const allProjects = await getActiveProjectsServer();
+    const project = allProjects.find((p) => p.slug === slug);
     if (!project) return {};
     return {
         title: `${project.title} | Before & After | Yuri Perfections`,
-        description: project.desc,
+        description: project.description,
     };
 }
 
 export default async function ProjectPage({ params }: PageProps) {
     const { slug } = await params;
-    const project = projects.find((p) => p.slug === slug);
+
+    // Single DB call — filter for the project and its siblings
+    const allProjects = await getActiveProjectsServer();
+    const project = allProjects.find((p) => p.slug === slug);
 
     if (!project) notFound();
+
+    const siblings = allProjects.filter((p) => p.slug !== slug).slice(0, 3);
 
     return (
         <>
             <Navbar />
             <main className="min-h-dvh">
-                <ProjectDetailClient slug={slug} />
+                <ProjectDetailClient project={project} siblings={siblings} />
             </main>
             <Footer />
             <ScrollToTop />
