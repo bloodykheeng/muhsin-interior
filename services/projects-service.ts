@@ -1,5 +1,6 @@
 import { createClient } from "@/utils/supabase/client";
 import { QueryClient } from "@tanstack/react-query";
+import { decodeImageUrl } from "@/utils/decode-url";
 
 export type ProjectImage = {
     id: number;
@@ -43,7 +44,11 @@ export async function getActiveProjects(): Promise<Project[]> {
 
     return (data ?? []).map((p) => ({
         ...p,
-        project_images: [...(p.project_images ?? [])].sort((a, b) => a.order - b.order),
+        cover_before: decodeImageUrl(p.cover_before),
+        cover_after: decodeImageUrl(p.cover_after),
+        project_images: [...(p.project_images ?? [])]
+            .sort((a, b) => a.order - b.order)
+            .map((img) => ({ ...img, before: decodeImageUrl(img.before), after: decodeImageUrl(img.after) })),
     }));
 }
 

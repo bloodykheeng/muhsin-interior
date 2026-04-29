@@ -1,5 +1,6 @@
 import { createClient } from "@/utils/supabase/client";
 import { QueryClient } from "@tanstack/react-query";
+import { decodeImageUrl } from "@/utils/decode-url";
 
 export type HeroSlide = {
     id: number;
@@ -24,7 +25,7 @@ export async function getActiveHeroSlides(): Promise<HeroSlide[]> {
 
     if (error) throw new Error(error.message);
 
-    return data ?? [];
+    return (data ?? []).map((s) => ({ ...s, image_url: decodeImageUrl(s.image_url) }));
 }
 
 // ── Realtime subscription ─────────────────────────────────────────────────────

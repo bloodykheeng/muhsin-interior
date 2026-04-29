@@ -3,6 +3,7 @@
 import { createClient } from "@/utils/supabase/server";
 import { cookies } from "next/headers";
 import type { HeroSlide } from "./hero-slides-service";
+import { decodeImageUrl } from "@/utils/decode-url";
 
 export async function getActiveHeroSlidesServer(): Promise<HeroSlide[]> {
     const cookieStore = await cookies();
@@ -16,5 +17,5 @@ export async function getActiveHeroSlidesServer(): Promise<HeroSlide[]> {
 
     if (error) throw new Error(error.message);
 
-    return data ?? [];
+    return (data ?? []).map((s) => ({ ...s, image_url: decodeImageUrl(s.image_url) }));
 }

@@ -3,6 +3,7 @@
 import { createClient } from "@/utils/supabase/server";
 import { cookies } from "next/headers";
 import type { Project } from "./projects-service";
+import { decodeImageUrl } from "@/utils/decode-url";
 
 async function buildClient() {
     const cookieStore = await cookies();
@@ -23,7 +24,11 @@ export async function getActiveProjectsServer(): Promise<Project[]> {
 
     return (data ?? []).map((p) => ({
         ...p,
-        project_images: [...(p.project_images ?? [])].sort((a, b) => a.order - b.order),
+        cover_before: decodeImageUrl(p.cover_before),
+        cover_after: decodeImageUrl(p.cover_after),
+        project_images: [...(p.project_images ?? [])]
+            .sort((a, b) => a.order - b.order)
+            .map((img) => ({ ...img, before: decodeImageUrl(img.before), after: decodeImageUrl(img.after) })),
     }));
 }
 
@@ -42,6 +47,10 @@ export async function getProjectBySlugServer(slug: string): Promise<Project | nu
 
     return {
         ...data,
-        project_images: [...(data.project_images ?? [])].sort((a, b) => a.order - b.order),
+        cover_before: decodeImageUrl(data.cover_before),
+        cover_after: decodeImageUrl(data.cover_after),
+        project_images: [...(data.project_images ?? [])]
+            .sort((a, b) => a.order - b.order)
+            .map((img) => ({ ...img, before: decodeImageUrl(img.before), after: decodeImageUrl(img.after) })),
     };
 }
