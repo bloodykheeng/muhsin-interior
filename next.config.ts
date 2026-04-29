@@ -21,10 +21,11 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'images.unsplash.com',
       },
-      {
-        protocol: 'https',
-        hostname: 'iykrvxusnnudoskkwish.supabase.co',
-      },
+      // bloodykheeng account hostname
+      // {
+      //   protocol: 'https',
+      //   hostname: 'iykrvxusnnudoskkwish.supabase.co',
+      // },
       //muhsin account hostname
       {
         protocol: 'https',
